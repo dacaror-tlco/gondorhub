@@ -1,0 +1,9 @@
+services:
+  web-campamento:
+    image: nginx:alpine
+    container_name: web-campamento
+    restart: unless-stopped
+    ports:
+      - "8084:80"
+    volumes:
+      - /mnt/hdd/web-campamento:/usr/share/nginx/html:ro

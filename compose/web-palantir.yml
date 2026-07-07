@@ -1,0 +1,9 @@
+services:
+  web-palantir:
+    image: nginx:alpine
+    container_name: web-palantir
+    restart: unless-stopped
+    ports:
+      - "8083:80"
+    volumes:
+      - /mnt/hdd/web-palantir:/usr/share/nginx/html:ro

@@ -1,0 +1,16 @@
+services:
+  npm:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - "80:80"       # HTTP público
+      - "443:443"     # HTTPS público
+      - "81:81"       # Panel de administración de NPM (solo red local)
+    volumes:
+      - /mnt/hdd/npm/data:/data
+      - /mnt/hdd/npm/letsencrypt:/etc/letsencrypt
+
+# Para usar el reto DNS de Cloudflare (certificados SSL sin exponer puertos extra):
+# pip install certbot-dns-cloudflare
+# (se instala desde la consola del contenedor, ver docs/services.md)

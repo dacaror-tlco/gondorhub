@@ -1,0 +1,22 @@
+services:
+  ddclient:
+    image: linuxserver/ddclient:latest
+    container_name: ddclient
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /mnt/HDD/ddclient/config:/config
+    restart: unless-stopped
+
+# Hay que configurar el archivo ddclient.conf dentro de /config, por ejemplo:
+#
+# use=web
+# web=myip.dnsomatic.com
+# protocol=freedns
+# server=freedns.afraid.org
+#
+# login=${DDCLIENT_LOGIN}
+# password=${DDCLIENT_PASSWORD}
+# ${DDNS_HOSTNAME}

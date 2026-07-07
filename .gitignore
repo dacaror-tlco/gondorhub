@@ -1,0 +1,21 @@
+# Secretos y configuración local — NUNCA subir
+.env
+*.env
+secrets/
+*.key
+*.pem
+*.crt
+
+# Volúmenes de datos (por si se copian sin querer al repo)
+data/
+volumes/
+*.sqlite
+*.db
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp

@@ -1,0 +1,20 @@
+services:
+  code-server:
+    image: lscr.io/linuxserver/code-server:latest
+    container_name: code-server
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - PASSWORD=${CODE_SERVER_PASSWORD}
+      - DEFAULT_WORKSPACE=/config/workspace
+    volumes:
+      - /mnt/hdd/code-server/config:/config
+      - /mnt/hdd/web-campamento:/config/workspace/web-campamento
+      - /mnt/hdd/web-palantir:/config/workspace/web-palantir
+      - /mnt/hdd/portalpi:/config/workspace/portalpi
+    ports:
+      - "8085:8443"
+    mem_limit: 512m
+    cpus: 1.0
+    restart: unless-stopped

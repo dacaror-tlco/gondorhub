@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  photoprism:
+    image: photoprism/photoprism:latest
+    container_name: photoprism
+    restart: unless-stopped
+    ports:
+      - "2342:2342"            # web UI en http://localhost:2342
+    environment:
+      PHOTOPRISM_ADMIN_PASSWORD: "${PHOTOPRISM_ADMIN_PASSWORD}"
+      PHOTOPRISM_HTTP_PORT: 2342
+      PHOTOPRISM_DETECT_NSFW: "true"
+      PHOTOPRISM_ORIGINALS_LIMIT: 0
+      TZ: "Europe/Madrid"
+    volumes:
+      - "/mnt/hdd/nextcloud/data/${NEXTCLOUD_DB_USER}/files/Fotos:/photoprism/originals"     # tu carpeta de fotos
+      - "/mnt/hdd/photoprism/data/photoprism-storage:/photoprism/storage"   # base de datos/cache (SQLite)
+
+volumes:
+  photoprism-storage:
+
+# NOTA: este servicio usa actualmente SQLite (backend por defecto), lo que provoca
+# errores "database is locked" durante la indexación facial concurrente en esta
+# hardware. Ver photoprism-mariadb.migration-example.yml para la migración recomendada.

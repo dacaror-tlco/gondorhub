@@ -1,0 +1,22 @@
+version: '3.4'
+
+services:
+  samba:
+    image: elswork/samba
+    environment:
+      TZ: 'Europe/Madrid'
+    networks:
+      - default
+    ports:
+      - "139:139"
+      - "445:445"
+    restart: unless-stopped
+    volumes:
+      - /mnt/hdd/samba:/samba
+      #- /path/to/be/shared:/share/folder
+    command: '-u "1000:1000:${SAMBA_USER}:${SAMBA_USER}:${SAMBA_PASSWORD}" -s "SAMBA:/samba:rw:${SAMBA_USER}"'
+
+# Necesario permitir todos los permisos de la carpeta antes de arrancar:
+# cd /mnt/hdd
+# ls -lh
+# sudo chmod 777 samba

@@ -1,0 +1,34 @@
+services:
+  nextcloud:
+    image: linuxserver/nextcloud
+    container_name: nextcloud
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    ports:
+      - 8443:443   # Puerto externo cambiado: NPM usará el 443 público
+    depends_on:
+      - mariadb
+    volumes:
+      - '/mnt/hdd/nextcloud/config:/config'
+      - '/mnt/hdd/nextcloud/data:/data'
+    restart: unless-stopped
+
+  mariadb:
+    image: linuxserver/mariadb
+    container_name: mariadb
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=nextcloud_db
+      - MYSQL_USER=${NEXTCLOUD_DB_USER}
+      - MYSQL_PASSWORD=${NEXTCLOUD_DB_PASSWORD}
+    ports:
+      - 3306:3306   # Solo necesario si accedes a la BD desde fuera del contenedor
+                    # Si no lo usas externamente, puedes eliminar este bloque ports:
+    volumes:
+      - '/mnt/hdd/mariadb/config:/config'
+    restart: unless-stopped

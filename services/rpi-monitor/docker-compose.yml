@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  rpi-monitor:
+    build: .
+    image: rpi-monitor:latest
+    container_name: rpi-monitor
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/rootfs:ro
+    environment:
+      - HOST_PROC=/host/proc
+    # Descomenta la línea de abajo si quieres intentar leer el estado
+    # de throttling con vcgencmd (requiere privileged y el dispositivo vchiq):
+    # privileged: true
+    # devices:
+    #   - /dev/vchiq

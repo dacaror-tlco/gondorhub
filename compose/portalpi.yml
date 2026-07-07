@@ -1,0 +1,9 @@
+services:
+  portalpi:
+    image: nginx:alpine
+    container_name: portalpi
+    restart: unless-stopped
+    ports:
+      - "8888:80"
+    volumes:
+      - /mnt/hdd/portalpi:/usr/share/nginx/html:ro
