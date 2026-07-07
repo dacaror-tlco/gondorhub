@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      WEBSOCKET_ENABLED: "true"
+      SIGNUPS_ALLOWED: "false"          # lo pones a true solo mientras creas tu cuenta, luego lo cierras
+      DOMAIN: "https://vault.${DOMAIN}"
+    volumes:
+      - /mnt/hdd/vaultwarden-data:/data
+    ports:
+      - "8086:80"

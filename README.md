@@ -22,6 +22,7 @@ Homelab self-hosted sobre una Raspberry Pi 4B (4GB RAM), con dominio propio, pro
 | MeTube | Descarga de vídeos (yt-dlp con UI) | `metube.yourdomain.com` |
 | Pi-hole | DNS ad-blocking | `pihole.yourdomain.com` |
 | WireGuard (wg-easy) | VPN | `vpn.yourdomain.com` |
+| Vaultwarden | Gestor de contraseñas (compatible con Bitwarden) | `vault.yourdomain.com` |
 | Portainer | Gestión de contenedores Docker | `portainer.yourdomain.com` |
 | code-server | Edición de código vía navegador | `code.yourdomain.com` |
 | web-campamento / web-palantir | Sitios estáticos de un proyecto de campamento juvenil | `campamento.yourdomain.com` / `palantir.yourdomain.com` |
