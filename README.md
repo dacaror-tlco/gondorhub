@@ -23,6 +23,7 @@ Homelab self-hosted sobre una Raspberry Pi 4B (4GB RAM), con dominio propio, pro
 | Pi-hole | DNS ad-blocking | `pihole.yourdomain.com` |
 | WireGuard (wg-easy) | VPN | `vpn.yourdomain.com` |
 | Vaultwarden | Gestor de contraseñas (compatible con Bitwarden) | `vault.yourdomain.com` |
+| Filebrowser | Explorador de archivos web, subida drag & drop al HDD | `files.yourdomain.com` |
 | Portainer | Gestión de contenedores Docker | `portainer.yourdomain.com` |
 | code-server | Edición de código vía navegador | `code.yourdomain.com` |
 | web-campamento / web-palantir | Sitios estáticos de un proyecto de campamento juvenil | `campamento.yourdomain.com` / `palantir.yourdomain.com` |
@@ -43,6 +44,7 @@ gondorhub/
 │   ├── code-server.yml
 │   ├── ddclient.yml
 │   ├── docker-controller-bot.yml
+│   ├── filebrowser.yml
 │   ├── jellyfin.yml
 │   ├── metube.yml
 │   ├── nextcloud.yml
@@ -53,11 +55,12 @@ gondorhub/
 │   ├── portalpi.yml
 │   ├── qbittorrent.yml
 │   ├── samba.yml
+│   ├── vaultwarden.yml
 │   ├── web-campamento.yml
 │   ├── web-palantir.yml
 │   └── wg-easy.yml
 ├── services/
-│   └── rpi-monitor/           # Dashboard de monitorización (Flask + psutil), código completo
+│   └── rpi-monitor/           # Dashboard de monitorización (Flask + psutil), imagen construida manualmente
 ├── docs/
 │   ├── architecture.md        # Arquitectura de red, DNS, SSL
 │   ├── services.md            # Detalle de cada servicio y su configuración
@@ -84,3 +87,42 @@ Ver [`docs/troubleshooting.md`](docs/troubleshooting.md) para el detalle, pero e
 - SQLite no aguanta bien la indexación facial concurrente de PhotoPrism en esta hardware → migrar a MariaDB.
 - Cloudflare con proxy (nube naranja) + HSTS activo en NPM = bucle de redirección. Solución: SSL Full (Strict) en Cloudflare y HSTS desactivado en NPM.
 - Portainer solo acepta compose sin `build:` — las imágenes custom hay que construirlas antes por SSH.
+- Bind mounts de **archivos individuales** (no carpetas) deben existir en el host antes del primer deploy, o Docker los crea como carpetas vacías y el contenedor falla. Ver el caso de Filebrowser abajo.
+- Los servicios con imagen custom (como rpi-monitor) no se despliegan en un solo paso vía Portainer: la imagen hay que construirla antes por SSH, y solo entonces se pega el stack.
+
+### Filebrowser: bind mounts de archivos individuales
+
+Filebrowser monta `filebrowser.db` y `settings.json` como **archivos** individuales, no como una carpeta completa. Si no existen ya en el host cuando se levanta el contenedor, Docker los crea como **carpetas vacías** en su lugar (comportamiento estándar de bind mounts), y el contenedor arranca con configuración por defecto o falla directamente.
+
+Por eso, antes del primer `docker compose up` / deploy en Portainer hay que crear los archivos vacíos a mano:
+
+```bash
+mkdir -p /mnt/hdd/filebrowser-config
+touch /mnt/hdd/filebrowser-config/filebrowser.db
+cat > /mnt/hdd/filebrowser-config/settings.json << 'EOF'
+{
+  "port": 80,
+  "baseURL": "",
+  "address": "",
+  "log": "stdout",
+  "database": "/database/filebrowser.db",
+  "root": "/srv"
+}
+EOF
+sudo chown -R "$USER":"$USER" /mnt/hdd/filebrowser-config
+```
+
+Esta misma regla aplica a cualquier futuro servicio que monte un archivo de config o una base de datos SQLite como volumen individual, no solo a Filebrowser.
+
+### rpi-monitor: despliegue en varias fases
+
+A diferencia del resto del stack (que se despliega pegando un compose directamente en Portainer, con imágenes públicas de Docker Hub), **rpi-monitor usa una imagen propia** construida a partir del código en `services/rpi-monitor/`. Portainer no puede construir imágenes desde su editor web (no acepta la directiva `build:` en el compose que se pega ahí), así que el despliegue tiene dos fases separadas:
+
+1. **Build manual por SSH**, desde el directorio con el `Dockerfile`:
+   ```bash
+   cd services/rpi-monitor
+   docker build -t rpi-monitor:latest .
+   ```
+2. **Deploy del stack en Portainer**, con un compose que referencia la imagen ya construida (sin `build:`, solo `image: rpi-monitor:latest`).
+
+Además, como usa `network_mode: host` (ver punto anterior), NPM tiene que apuntar a la IP del host (`192.168.1.x:5000`) en vez de al nombre del contenedor, y Portainer no mostrará mapeo de puertos en su UI — es el comportamiento esperado con este modo de red, no un fallo.
