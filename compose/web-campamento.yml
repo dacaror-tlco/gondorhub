@@ -6,4 +6,4 @@ services:
     ports:
       - "8084:80"
     volumes:
-      - /mnt/hdd/web-campamento:/usr/share/nginx/html:ro
+      - /mnt/hdd/webs/web-campamento:/usr/share/nginx/html:ro

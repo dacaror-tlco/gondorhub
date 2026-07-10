@@ -84,7 +84,7 @@ gondorhub/
 Ver [`docs/troubleshooting.md`](docs/troubleshooting.md) para el detalle, pero en resumen:
 
 - `network_mode: host` rompe la resolución por nombre de contenedor en NPM → hay que apuntar a la IP del host.
-- SQLite no aguanta bien la indexación facial concurrente de PhotoPrism en esta hardware → migrar a MariaDB.
+- SQLite no aguanta bien la indexación concurrente de PhotoPrism en esta hardware (miniaturas, metadata y reconocimiento facial escribiendo a la vez) → migrado a MariaDB. Ver detalle abajo.
 - Cloudflare con proxy (nube naranja) + HSTS activo en NPM = bucle de redirección. Solución: SSL Full (Strict) en Cloudflare y HSTS desactivado en NPM.
 - Portainer solo acepta compose sin `build:` — las imágenes custom hay que construirlas antes por SSH.
 - Bind mounts de **archivos individuales** (no carpetas) deben existir en el host antes del primer deploy, o Docker los crea como carpetas vacías y el contenedor falla. Ver el caso de Filebrowser abajo.
@@ -126,3 +126,18 @@ A diferencia del resto del stack (que se despliega pegando un compose directamen
 2. **Deploy del stack en Portainer**, con un compose que referencia la imagen ya construida (sin `build:`, solo `image: rpi-monitor:latest`).
 
 Además, como usa `network_mode: host` (ver punto anterior), NPM tiene que apuntar a la IP del host (`192.168.1.x:5000`) en vez de al nombre del contenedor, y Portainer no mostrará mapeo de puertos en su UI — es el comportamiento esperado con este modo de red, no un fallo.
+
+### PhotoPrism: migración de SQLite a MariaDB
+
+PhotoPrism usa SQLite por defecto: un único archivo, sin proceso de servidor separado. El problema es que SQLite solo permite **un escritor a la vez** — con el indexado en segundo plano (miniaturas, metadata EXIF, reconocimiento facial) escribiendo de forma concurrente, en un HDD externo sobre una Pi, esto provocaba bloqueos ("database is locked") y ralentizaba o colgaba la indexación.
+
+**Importante:** esto no tiene relación con dónde viven los archivos de fotos. La carpeta de originales sigue montada igual desde Nextcloud (`/photoprism/originals`) y no se toca en ningún momento de la migración — la base de datos solo almacena el *índice* (miniaturas, metadata, caras), nunca las fotos en sí.
+
+Pasos seguidos para migrar:
+
+1. Añadir un servicio `photoprism-mariadb` (imagen `mariadb:11`) al mismo stack, con su propio volumen persistente.
+2. Añadir las variables `PHOTOPRISM_DATABASE_DRIVER: mysql`, `PHOTOPRISM_DATABASE_SERVER`, `PHOTOPRISM_DATABASE_NAME`, `PHOTOPRISM_DATABASE_USER` y `PHOTOPRISM_DATABASE_PASSWORD` al servicio `photoprism`.
+3. Redesplegar el stack — esto crea el esquema nuevo en MariaDB, vacío.
+4. Forzar un reindexado completo de la librería desde **Library → Index** (o `docker exec -it photoprism photoprism index`), ya que la base nueva no trae histórico: PhotoPrism vuelve a leer los archivos originales (sin tocarlos) y reconstruye el índice desde cero.
+
+Ver `compose/photoprism-mariadb.migration-example.yml` para la plantilla completa.

@@ -6,4 +6,4 @@ services:
     ports:
       - "8083:80"
     volumes:
-      - /mnt/hdd/web-palantir:/usr/share/nginx/html:ro
+      - /mnt/hdd/webs/web-palantir:/usr/share/nginx/html:ro

@@ -9,7 +9,7 @@ services:
       PUID: 1000
       PGID: 1000
     volumes:
-      - /mnt/hdd:/srv
+      - /mnt/hdd/webs:/srv
       - /mnt/hdd/filebrowser-config/filebrowser.db:/database/filebrowser.db
       - /mnt/hdd/filebrowser-config/settings.json:/.filebrowser.json
     ports:
