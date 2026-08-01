@@ -1,27 +1,13 @@
+version: "3"
 services:
-  metube:
-    image: ghcr.io/alexta69/metube
-    container_name: metube
-    restart: unless-stopped
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-      - MAX_CONCURRENT_DOWNLOADS=3
-      # Actualiza yt-dlp cada noche a las 03:00: YouTube cambia su
-      # backend a menudo y rompe descargas hasta que yt-dlp se actualiza;
-      # la imagen "stable" de MeTube no siempre sigue el ritmo.
-      - YTDL_NIGHTLY_UPDATE_TIME=03:00
-      # player_client=android/ios evita el throttling/SABR de YouTube que
-      # causa descargas atascadas o en mala calidad con el cliente web por
-      # defecto; mergea a mp4 y reintenta fragmentos rotos.
-      - >-
-        YTDL_OPTIONS={"format":"bestvideo[ext=mp4]+bestaudio[ext=m4a]/best",
-        "merge_output_format":"mp4",
-        "retries":10,
-        "fragment_retries":10,
-        "extractor_args":{"youtube":{"player_client":["android","web"]}}}
-    ports:
-      - "8081:8081"
-    volumes:
-      - /mnt/hdd/samba/metube:/downloads
+    metube:
+        image: ghcr.io/alexta69/metube:latest
+        container_name: metube
+        restart: unless-stopped
+        ports:
+            - "8081:8081"
+        volumes:
+            - /mnt/hdd/samba/metube:/downloads
+        environment:
+            PUID: 1000
+            PGID: 1000
