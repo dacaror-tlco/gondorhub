@@ -45,11 +45,13 @@ Editor de código (VS Code en navegador) para editar las webs estáticas sin nec
 
 ## Webs estáticas del campamento (web-campamento / web-palantir)
 
-Sitios HTML/CSS/JS vanilla (sin frameworks ni build tools), servidos cada uno con su propio contenedor `nginx:alpine`.
+Sitios HTML/CSS/JS vanilla (sin frameworks ni build tools).
 
-- Los archivos fuente viven en `/mnt/hdd/` en la Raspberry Pi.
+- **web-campamento:** servido con contenedor `nginx:alpine` puro (estático, sin backend).
+- **web-palantir:** migrado de `nginx:alpine` a `node:20-alpine` con un pequeño backend Express (`backend/server.js`), para soportar un endpoint de subida de documentos (ver detalle en [camp-project.md](camp-project.md)). El sitio estático se sigue sirviendo igual, ahora vía `express.static` en vez de nginx. El contenedor instala dependencias (`npm install --omit=dev`) al arrancar — no hay paso de build previo.
+- Los archivos fuente viven en `/mnt/hdd/` en la Raspberry Pi. En `web-palantir`, los documentos subidos por el formulario se guardan en un volumen aparte (`/mnt/hdd/webs/web-palantir-uploads`), fuera del bind mount de solo lectura del sitio.
 - Flujo de despliegue: se editan/guardan localmente en Windows (con copia también en Nextcloud), y se suben por SCP.
-- Ver [camp-project.md](camp-project.md) para más detalle.
+- Ver [camp-project.md](camp-project.md) para más detalle, y [troubleshooting.md](troubleshooting.md) para los problemas de permisos y despliegue encontrados al migrar `web-palantir` a Node/Express.
 
 ## Otros servicios
 

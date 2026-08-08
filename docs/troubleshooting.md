@@ -69,3 +69,31 @@ Problemas reales encontrados montando este homelab, y cómo se resolvieron.
 **Causa:** el proveedor de identidad (IdP) solo verifica *quién eres*, no *si tienes permiso*.
 
 **Solución:** crear una política explícita de tipo "Allow" en Cloudflare Access con selectores de email concretos (o dominio de email) para restringir el acceso a las cuentas deseadas.
+
+## Imágenes/fuentes que no se actualizan tras subir cambios por SCP
+
+**Síntoma:** se sube contenido nuevo (imágenes, fuentes) a una web estática por SCP, pero el sitio sigue sirviendo la versión antigua o directamente no carga esos archivos.
+
+**Causa:** no es caché (ni de Cloudflare ni del navegador) — los archivos subidos por SCP quedan sin permiso de lectura para el usuario con el que corre el contenedor que sirve el sitio.
+
+**Solución:** tras cada subida por SCP, dar permiso de lectura recursivo a todo el contenido del sitio:
+
+```bash
+sudo chmod -R a+rX /ruta/al/sitio
+```
+
+`X` mayúscula en vez de `x` para que solo se marquen como ejecutables los directorios (necesario para poder listarlos/atravesarlos), no los archivos.
+
+## Bucle de reinicio en contenedor Node por `npm error ... ENOENT ... package.json`
+
+**Síntoma:** al migrar un sitio estático a un contenedor `node:20-alpine` que hace `npm install && node server.js` al arrancar, el contenedor entra en bucle de reinicio (`restart: unless-stopped`) con el log repitiendo `ENOENT: no such file or directory, open '/app/package.json'`, aunque el `package.json` sí se subió por SCP.
+
+**Causa:** la carpeta de destino en el host (montada luego como `/app`) ya existía de antes — creada por Docker (como root) al levantar por primera vez el stack con el volumen definido, antes de que se subiera ningún archivo. Al hacer `scp -r carpeta-local usuario@host:/ruta/carpeta-remota-que-ya-existe/`, scp copia la carpeta local **dentro** de la remota en vez de fusionar su contenido, resultando en un nivel de anidación de más (`carpeta-remota/carpeta-local/package.json`) en vez de `carpeta-remota/package.json`. Además, al haber sido creada por Docker como root, el usuario SSH normal no tenía permiso de escritura ahí, así que la subida fallaba en silencio.
+
+**Solución:**
+1. Abrir permisos de la carpeta de destino: `sudo chmod -R a+rwX /ruta/carpeta-remota` (necesita escritura, no solo lectura, porque `npm install` escribe `node_modules` ahí).
+2. Volver a subir usando `.` al final del origen para copiar el **contenido** de la carpeta, no la carpeta en sí:
+   ```bash
+   scp -r "carpeta-local/." usuario@host:/ruta/carpeta-remota/
+   ```
+3. El contenedor recoge los archivos nuevos en el siguiente reinicio automático (el `restart: unless-stopped` ya está reintentando) — no hace falta redesplegar el stack a mano.

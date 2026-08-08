@@ -1,9 +1,16 @@
 services:
   web-palantir:
-    image: nginx:alpine
+    image: node:20-alpine
     container_name: web-palantir
     restart: unless-stopped
+    working_dir: /app
     ports:
-      - "8083:80"
+      - "8083:3000"
     volumes:
-      - /mnt/hdd/webs/web-palantir:/usr/share/nginx/html:ro
+      - /mnt/hdd/webs/web-palantir/backend:/app
+      - /mnt/hdd/webs/web-palantir:/site:ro
+      - /mnt/hdd/webs/web-palantir-uploads:/app/uploads
+    command: sh -c "npm install --omit=dev && node server.js"
+    environment:
+      - PORT=3000
+      - PUBLIC_DIR=/site
