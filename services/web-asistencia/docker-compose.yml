@@ -1,0 +1,49 @@
+# Web de asistencia · Juniors Axenia 603 D
+# ------------------------------------------------------------------
+# Despliegue como STACK en Portainer (o `docker compose up -d` en la Pi).
+#
+# Preparación en la Pi (una vez), en /mnt/hdd/webs/web-asistencia:
+#   cp includes/config.example.php includes/config.php   # y edita la contraseña
+#   cp data/seed.example.json      data/seed.json        # y pon la lista real
+#   sudo chmod -R a+rX .                                 # el contenedor debe poder leer
+#   sudo chown -R 33:33 data && sudo chmod -R 775 data   # 33 = www-data del contenedor
+#
+# Para actualizar la web: copiar los archivos nuevos (scp) y, si cambió
+# este compose, redeplegar el stack. Cambios en .php/.css/.js no requieren
+# reinicio (la carpeta va montada).
+# ------------------------------------------------------------------
+
+services:
+  web-asistencia:
+    image: php:8.3-apache
+    container_name: web-asistencia
+    restart: unless-stopped
+
+    ports:
+      - "8088:80"          # NPM apunta aquí: asistencia.${DOMAIN} -> IP_PI:8088
+
+    volumes:
+      - /mnt/hdd/webs/web-asistencia:/var/www/html
+
+    # Activa AllowOverride (para que el .htaccess bloquee /data y /includes)
+    # y los módulos necesarios; luego arranca Apache. Sin Dockerfile.
+    command: >
+      bash -c "sed -ri 's|AllowOverride None|AllowOverride All|g' /etc/apache2/apache2.conf &&
+               a2enmod rewrite headers expires >/dev/null 2>&1;
+               exec apache2-foreground"
+
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/login.php') === false ? 1 : 0);"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+    # Si prefieres que quede SOLO detrás de Nginx Proxy Manager, quita el
+    # bloque "ports" de arriba y descomenta esto (NPM apuntaría a web-asistencia:80):
+    # networks:
+    #   - proxy
+
+# networks:
+#   proxy:
+#     external: true

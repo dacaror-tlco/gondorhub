@@ -1,0 +1,26 @@
+# Web de asistencia de educadores/colaboradores (PHP + JSON, sin BBDD).
+# Código y documentación completos en services/web-asistencia/ y docs/web-asistencia.md
+# Antes de arrancar (en /mnt/hdd/webs/web-asistencia, una vez):
+#   cp includes/config.example.php includes/config.php   # editar contraseña
+#   cp data/seed.example.json      data/seed.json        # lista real (no va a git)
+#   sudo chmod -R a+rX . && sudo chown -R 33:33 data && sudo chmod -R 775 data
+
+services:
+  web-asistencia:
+    image: php:8.3-apache
+    container_name: web-asistencia
+    restart: unless-stopped
+    ports:
+      - "8088:80"          # NPM: asistencia.${DOMAIN} -> ${PI_HOST_IP}:8088
+    volumes:
+      - /mnt/hdd/webs/web-asistencia:/var/www/html
+    command: >
+      bash -c "sed -ri 's|AllowOverride None|AllowOverride All|g' /etc/apache2/apache2.conf &&
+               a2enmod rewrite headers expires >/dev/null 2>&1;
+               exec apache2-foreground"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/login.php') === false ? 1 : 0);"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

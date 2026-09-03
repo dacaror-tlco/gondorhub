@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "meta": {
+    "curso": "2026-2027",
+    "nota": "PLANTILLA. Copia este archivo a data/seed.json y sustituye por la lista real. data/seed.json y data/data.json estan en .gitignore y no se suben al repo."
+  },
+  "personas": [
+    { "id": "p001", "nombre": "Educador de ejemplo 1", "categoria": "educador", "activo": true },
+    { "id": "p002", "nombre": "Educadora de ejemplo 2", "categoria": "educador", "activo": true },
+    { "id": "p003", "nombre": "Educador de ejemplo 3", "categoria": "educador", "activo": true },
+    { "id": "p004", "nombre": "Educadora de ejemplo 4", "categoria": "educador", "activo": true },
+    { "id": "p005", "nombre": "Educador de ejemplo 5", "categoria": "educador", "activo": true },
+    { "id": "p006", "nombre": "Educadora de ejemplo 6", "categoria": "educador", "activo": true },
+    { "id": "p007", "nombre": "Colaborador de ejemplo 1", "categoria": "colaborador", "activo": true },
+    { "id": "p008", "nombre": "Colaboradora de ejemplo 2", "categoria": "colaborador", "activo": true },
+    { "id": "p009", "nombre": "Colaborador de ejemplo 3", "categoria": "colaborador", "activo": true },
+    { "id": "p010", "nombre": "Colaboradora de ejemplo 4", "categoria": "colaborador", "activo": true },
+    { "id": "p011", "nombre": "Colaborador de ejemplo 5", "categoria": "colaborador", "activo": true },
+    { "id": "p012", "nombre": "Colaboradora de ejemplo 6", "categoria": "colaborador", "activo": true }
+  ],
+  "actividades": []
+}
