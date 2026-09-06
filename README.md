@@ -93,6 +93,7 @@ Ver [`docs/troubleshooting.md`](docs/troubleshooting.md) para el detalle, pero e
 - Portainer solo acepta compose sin `build:` — las imágenes custom hay que construirlas antes por SSH.
 - Bind mounts de **archivos individuales** (no carpetas) deben existir en el host antes del primer deploy, o Docker los crea como carpetas vacías y el contenedor falla. Ver el caso de Filebrowser abajo.
 - Los servicios con imagen custom (como rpi-monitor) no se despliegan en un solo paso vía Portainer: la imagen hay que construirla antes por SSH, y solo entonces se pega el stack.
+- Bibliotecas restringidas en Jellyfin (un usuario con acceso solo a un subconjunto de contenido) requieren symlinks **relativos**, no rutas absolutas del host — el contenedor no conoce la ruta del host, solo sus propios puntos de montaje. Ver detalle abajo.
 
 ### Filebrowser: bind mounts de archivos individuales
 
@@ -145,3 +146,15 @@ Pasos seguidos para migrar:
 4. Forzar un reindexado completo de la librería desde **Library → Index** (o `docker exec -it photoprism photoprism index`), ya que la base nueva no trae histórico: PhotoPrism vuelve a leer los archivos originales (sin tocarlos) y reconstruye el índice desde cero.
 
 Ver `compose/photoprism-mariadb.migration-example.yml` para la plantilla completa.
+
+### Jellyfin: biblioteca restringida a un subconjunto de contenido
+
+Necesitaba dar acceso a un usuario externo a solo 3 títulos de una biblioteca de películas con decenas, sin exponer el resto. Jellyfin no soporta restricciones a nivel de título, solo a nivel de **biblioteca completa** — así que la solución fue crear una biblioteca nueva que contuviera únicamente esos títulos, y restringir al usuario nuevo a ella.
+
+1. Carpeta nueva junto a la biblioteca original (`/mnt/hdd/samba/movies-lotr`, hermana de `/mnt/hdd/samba/movies`), con symlinks a los archivos concretos — sin duplicar contenido en disco.
+2. Montarla en el contenedor como volumen adicional (`compose/jellyfin.yml`) y añadirla como biblioteca nueva desde el panel de administración.
+3. Crear el usuario con "Habilitar acceso a todas las bibliotecas" desactivado, marcando solo la biblioteca nueva.
+
+**Aprendizaje clave — symlinks relativos, no absolutos:** los primeros symlinks se crearon con rutas absolutas del host (`ln -s /mnt/hdd/samba/movies/... `). Funcionaban al listarlos desde el host, pero dentro del contenedor de Jellyfin aparecían rotos (`ls -laL` fallaba con "No such file or directory"). Motivo: el contenedor monta `movies` en `/movies` (no en `/mnt/hdd/samba/movies`), así que una ruta absoluta del host no significa nada dentro del namespace del contenedor. La solución es usar rutas **relativas** entre las dos carpetas hermanas (`ln -s ../movies/carpeta/archivo.mkv`), que resuelven igual de bien en el host que en cualquier contenedor que monte ambas carpetas conservando la misma relación de hermandad.
+
+Efecto secundario descubierto de paso: si el nombre real de un archivo/carpeta contiene un carácter no imprimible (p. ej. un salto de línea, típico de descargas mal empaquetadas), `ls` lo muestra con notación de escape de shell (`Nombre'$'\n''resto`). Esa notación es solo para lectura — copiarla tal cual como argumento de `ln -s` no reproduce el byte real y el enlace queda roto. Mejor usar comodines (`*`) para que sea el propio shell quien resuelva el nombre exacto, bytes no imprimibles incluidos.

@@ -12,6 +12,7 @@ services:
       - /mnt/hdd/samba/series:/series
       - /mnt/hdd/samba/movies:/movies
       - /mnt/hdd/samba/music:/music
+      - /mnt/hdd/samba/movies-lotr:/movies-lotr
     ports:
       - 8096:8096
       - 8920:8920 #optional
