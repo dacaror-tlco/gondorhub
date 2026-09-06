@@ -33,6 +33,7 @@ Homelab self-hosted sobre una Raspberry Pi 4B (4GB RAM), con dominio propio, pro
 | docker-controller-bot | Bot de Telegram para gestionar contenedores Docker | (sin subdominio, uso vía Telegram) |
 | rpi-monitor | Dashboard propio de monitorización del sistema (Flask + psutil) | `monitor.yourdomain.com` |
 | web-asistencia | App propia de control de asistencia de un grupo juvenil (PHP + JSON, sin BBDD) | `asistencia.yourdomain.com` |
+| gondorhub-watch | Vigila el dominio y avisa por Telegram cuando LaLiga lo bloquea / desbloquea | (sin subdominio, uso vía Telegram) |
 
 ## Estructura del repo
 
@@ -63,7 +64,8 @@ gondorhub/
 │   └── wg-easy.yml
 ├── services/
 │   ├── rpi-monitor/           # Dashboard de monitorización (Flask + psutil), imagen construida manualmente
-│   └── web-asistencia/        # App de control de asistencia (PHP + Apache, sin BBDD)
+│   ├── web-asistencia/        # App de control de asistencia (PHP + Apache, sin BBDD)
+│   └── gondorhub-watch/       # Vigilante del dominio: avisa por Telegram del bloqueo de LaLiga
 ├── docs/
 │   ├── architecture.md        # Arquitectura de red, DNS, SSL
 │   ├── services.md            # Detalle de cada servicio y su configuración

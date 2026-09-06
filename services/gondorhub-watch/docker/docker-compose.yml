@@ -1,0 +1,39 @@
+# Stack para el Portainer de la Pi. NO hay que construir imagen: usa alpine tal
+# cual y le pasamos los scripts por un volumen.
+#
+# ANTES de desplegar (una sola vez), con Filebrowser:
+#   1. Crea la carpeta  /mnt/hdd/gondorhub-watch
+#   2. Sube ahi dentro  watch.sh  y  entrypoint.sh
+#      (estan en  gondorhub-watch/  y  gondorhub-watch/docker/  del PC)
+#
+# Luego: Portainer > Stacks > Add stack > pega esto > rellena TELEGRAM_* > Deploy.
+
+version: "3.8"
+
+services:
+  gondorhub-watch:
+    image: alpine:3.20
+    container_name: gondorhub-watch
+    restart: always
+    environment:
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_ADMIN=${TELEGRAM_ADMIN_ID}
+      - DOMAIN=yourdomain.com
+      - INTERVAL_SECONDS=120
+      - STATE_DIR=/data
+      - TZ=Europe/Madrid
+      - TZ_DISPLAY=Europe/Madrid
+      # Sensor externo (opcional): URL "raw" del gist SIN hash de commit
+      #- GIST_RAW_URL=https://gist.githubusercontent.com/TU_USUARIO/TU_GIST_ID/raw/status.json
+    volumes:
+      - /mnt/hdd/gondorhub-watch:/app:ro      # aqui van watch.sh y entrypoint.sh (subidos con Filebrowser)
+      - gondorhub-watch-data:/data            # estado persistente (state / since / pending)
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        apk add --no-cache bash curl ca-certificates tzdata bind-tools >/dev/null 2>&1 || true
+        exec bash /app/entrypoint.sh
+
+volumes:
+  gondorhub-watch-data:

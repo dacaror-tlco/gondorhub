@@ -1,0 +1,5 @@
+# Solo estos archivos entran en el contexto de build (nada de watch.env ni docs).
+*
+!watch.sh
+!docker/Dockerfile
+!docker/entrypoint.sh

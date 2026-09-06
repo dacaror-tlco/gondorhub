@@ -1,0 +1,70 @@
+name: gondorhub-probe
+
+# Sensor EXTERNO (fuera de España): comprueba yourdomain.com desde los runners de
+# GitHub y publica el resultado en un Gist que la Pi consulta para distinguir
+# "bloqueo de LaLiga" de "caída real".
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'   # repo PÚBLICO: minutos de Actions ilimitados.
+                             # repo PRIVADO (2000 min/mes): sube a '*/15 * * * *' o '*/30 * * * *'.
+  workflow_dispatch:
+
+concurrency:
+  group: gondorhub-probe
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comprobar yourdomain.com desde fuera de España
+        id: check
+        env:
+          DOMAIN: ${{ vars.GONDORHUB_DOMAIN || 'yourdomain.com' }}
+        run: |
+          code="$(curl -sS --max-time 20 -o /dev/null -w '%{http_code}' "https://${DOMAIN}/" || true)"
+          echo "http_code=$code"
+          if [ -n "$code" ] && [ "$code" -ge 100 ] && [ "$code" -lt 500 ]; then
+            echo "up=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "up=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+
+      - name: Publicar estado en el Gist
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+          UP: ${{ steps.check.outputs.up }}
+          CODE: ${{ steps.check.outputs.code }}
+        run: |
+          content="$(jq -nc --argjson up "$UP" --arg code "$CODE" \
+            --arg ts "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --argjson epoch "$(date -u +%s)" \
+            '{up:$up, http_code:$code, checked_at:$ts, checked_at_epoch:$epoch, source:"github-actions"}')"
+          body="$(jq -nc --arg c "$content" '{files:{"status.json":{content:$c}}}')"
+          curl -sS --fail -X PATCH \
+            -H "Authorization: Bearer $GIST_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/gists/$GIST_ID" \
+            -d "$body" -o /dev/null
+
+      - name: Avisar por Telegram si tampoco responde desde fuera (caída real)
+        if: steps.check.outputs.up == 'false'
+        continue-on-error: true
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_ADMIN: ${{ secrets.TELEGRAM_ADMIN }}
+          CODE: ${{ steps.check.outputs.code }}
+        run: |
+          [ -n "$TELEGRAM_TOKEN" ] || { echo "sin TELEGRAM_TOKEN, salto el aviso"; exit 0; }
+          curl -sS --max-time 15 -X POST \
+            "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TELEGRAM_ADMIN}" \
+            --data-urlencode "text=🟠 yourdomain.com no responde tampoco desde fuera de España (HTTP ${CODE}). Probable caída real, no bloqueo de LaLiga. $(date -u +'%H:%M UTC')" \
+            -o /dev/null
