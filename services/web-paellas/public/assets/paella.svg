@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Paella">
+  <defs>
+    <clipPath id="rice"><circle cx="120" cy="120" r="86"/></clipPath>
+  </defs>
+  <!-- asas -->
+  <rect x="8" y="112" width="44" height="16" rx="8" fill="#2b2118"/>
+  <rect x="188" y="112" width="44" height="16" rx="8" fill="#2b2118"/>
+  <!-- borde de la paellera -->
+  <circle cx="120" cy="120" r="100" fill="#2b2118"/>
+  <circle cx="120" cy="120" r="92" fill="#3a2e22"/>
+  <!-- arroz -->
+  <circle cx="120" cy="120" r="86" fill="#F2B705"/>
+  <g clip-path="url(#rice)">
+    <circle cx="120" cy="120" r="86" fill="#F2B705"/>
+    <path d="M20 150c40 18 160 18 200 0v90H20z" fill="#E8A100"/>
+    <!-- tiras de pimiento -->
+    <rect x="52" y="70" width="70" height="12" rx="6" fill="#D4470E" transform="rotate(-18 87 76)"/>
+    <rect x="120" y="150" width="78" height="12" rx="6" fill="#D4470E" transform="rotate(-8 159 156)"/>
+    <rect x="70" y="140" width="60" height="11" rx="5" fill="#E1560F" transform="rotate(22 100 145)"/>
+    <!-- guisantes -->
+    <circle cx="86" cy="112" r="7" fill="#46A302"/>
+    <circle cx="150" cy="92" r="7" fill="#46A302"/>
+    <circle cx="140" cy="150" r="7" fill="#5BB80A"/>
+    <circle cx="104" cy="158" r="6" fill="#46A302"/>
+    <circle cx="170" cy="128" r="6" fill="#5BB80A"/>
+    <circle cx="66" cy="140" r="6" fill="#46A302"/>
+    <!-- gambas -->
+    <path d="M150 118c14-2 24 6 22 18-1 8-9 13-17 11 6-3 9-9 6-15-3-7-11-9-11-14z" fill="#F98866"/>
+    <path d="M92 82c13-3 23 4 22 16-1 8-8 13-16 12 6-4 8-10 5-16-3-6-11-8-11-12z" fill="#FF9C7A"/>
+    <!-- limon -->
+    <path d="M120 120 L96 96 A34 34 0 0 1 144 96 Z" fill="#FFE066"/>
+    <path d="M120 120 L96 96 A34 34 0 0 1 144 96 Z" fill="none" stroke="#FFF4C2" stroke-width="5"/>
+  </g>
+  <!-- brillo -->
+  <path d="M60 78a70 70 0 0 1 44-28" fill="none" stroke="#FFE9A8" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+</svg>

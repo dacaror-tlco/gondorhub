@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paellas Night 11.0 · Centro Juniors Axenia</title>
+  <meta name="description" content="Reserva tus tickets para la Paellas Night 11.0 del Centro Juniors Axenia. Paella, bebida y fruta. A beneficio del campamento.">
+  <meta name="theme-color" content="#F2790F">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:title" content="Paellas Night 11.0 · Centro Juniors Axenia">
+  <meta property="og:description" content="Reserva tus tickets: paella, bebida y fruta. A beneficio del campamento.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="confetti" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="brand">
+      <img src="/assets/logo-axenia.png" alt="Juniors Axenia 603 D" class="brand__logo">
+      <span class="brand__txt">Juniors M.D. <b>Axenia</b></span>
+    </div>
+  </header>
+
+  <main>
+    <!-- ================= HERO ================= -->
+    <section class="hero card">
+      <div class="hero__text">
+        <p class="kicker" id="cfgSubtitulo">Centro Juniors Axenia</p>
+        <h1 class="hero__title" id="cfgNombre">Paellas <span>Night 11.0</span></h1>
+        <p class="hero__tagline" id="cfgTagline">Una noche de paellas para llenar la mochila del campamento.</p>
+
+        <ul class="facts">
+          <li><span class="facts__ic" aria-hidden="true">📅</span> <span id="cfgFecha">5 de agosto de 2027</span></li>
+          <li><span class="facts__ic" aria-hidden="true">🕖</span> <span id="cfgHora">A partir de las 19:00 h</span></li>
+          <li>
+            <span class="facts__ic" aria-hidden="true">📍</span>
+            <a id="cfgMaps" href="#" target="_blank" rel="noopener">
+              <span id="cfgLugar">Centro Juniors Axenia</span> — <span id="cfgDireccion">C/ Emilio Casanova, 2</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="includes">
+          <span class="includes__label">Cada ticket incluye</span>
+          <div class="includes__chips" id="cfgIncluye">
+            <span class="chip chip--paella">Paella</span>
+            <span class="chip chip--bebida">Bebida</span>
+            <span class="chip chip--fruta">Fruta</span>
+          </div>
+        </div>
+
+        <a href="#reservar" class="btn btn--primary hero__cta">Reservar mis tickets</a>
+      </div>
+
+      <div class="hero__art">
+        <img src="/assets/paella.svg" alt="" class="hero__pan" aria-hidden="true">
+        <div class="price-badge"><b id="cfgPrecio">8</b><span>€ / ticket</span></div>
+        <img src="/assets/patxi.png" alt="Patxi, la mascota de Juniors Axenia" class="hero__patxi">
+      </div>
+    </section>
+
+    <!-- ================= RESERVA ================= -->
+    <section id="reservar" class="reserva card">
+      <h2>Reserva tus tickets</h2>
+      <p class="reserva__lead">
+        Haz la reserva aquí y recoge los tickets en el Centro Juniors.
+      </p>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="nombre">Nombre de la reserva</label>
+          <input id="nombre" name="nombre" type="text" autocomplete="name" maxlength="80" required
+                 placeholder="Ej. Familia Pérez / Peña los grillos">
+        </div>
+
+        <div class="field">
+          <label for="cantidad">Número de tickets</label>
+          <div class="stepper">
+            <button type="button" class="stepper__btn" data-step="-1" aria-label="Quitar un ticket">−</button>
+            <input id="cantidad" name="cantidad" type="number" inputmode="numeric" min="1" max="30" step="1" value="2" required>
+            <button type="button" class="stepper__btn" data-step="1" aria-label="Añadir un ticket">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="telefono">Teléfono de contacto <span class="opt">(opcional)</span></label>
+          <input id="telefono" name="telefono" type="tel" autocomplete="tel" maxlength="30"
+                 placeholder="Por si necesitamos avisarte de algo">
+        </div>
+
+        <input type="text" name="web" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+        <p class="total" aria-live="polite">Total a pagar al recoger: <b id="total">16 €</b></p>
+
+        <button type="submit" class="btn btn--primary btn--block" id="submit">Reservar tickets</button>
+
+        <p class="finePrint">
+          No se paga ahora. El pago es en efectivo o con datáfono al recoger los tickets en el Centro Juniors Axenia.
+        </p>
+        <p class="formError" id="formError" role="alert" hidden></p>
+      </form>
+
+      <div class="closed" id="closed" hidden>
+        <p id="closedMsg">La reserva por la web está cerrada.</p>
+        <p>Llámanos al <a id="closedTel" href="#">—</a> y te ayudamos.</p>
+      </div>
+
+      <div class="success" id="success" hidden>
+        <div class="success__check" aria-hidden="true">✓</div>
+        <h3>¡Reserva confirmada!</h3>
+
+        <div class="ticket">
+          <span class="ticket__label">Tu código</span>
+          <span class="ticket__code" id="okCodigo">PN-XXXX</span>
+        </div>
+
+        <dl class="okDetails">
+          <div><dt>A nombre de</dt><dd id="okNombre">—</dd></div>
+          <div><dt>Tickets</dt><dd id="okCantidad">—</dd></div>
+          <div><dt>Total</dt><dd id="okTotal">—</dd></div>
+        </dl>
+
+        <p class="okHint">
+          Enséñanos este código (o di el nombre de la reserva) al recoger los tickets en el
+          <b>Centro Juniors Axenia</b>. El pago se hace al recoger.
+        </p>
+        <p class="okHint" id="okCambios">¿Algún cambio? Llámanos.</p>
+
+        <button type="button" class="btn btn--ghost" id="otra">Hacer otra reserva</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <img src="/assets/logo-axenia.png" alt="Juniors Axenia 603 D" class="brand__logo site-footer__logo">
+    <p class="site-footer__title">Paellas <span>Night 11.0</span> · Organiza Juniors M.D. Axenia · A beneficio del campamento</p>
+    <p>
+      Contacto: <a id="ftTel" href="#">—</a>
+      · <a id="ftMaps" href="#" target="_blank" rel="noopener"><span id="ftDir">C/ Emilio Casanova, 2</span></a>
+    </p>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

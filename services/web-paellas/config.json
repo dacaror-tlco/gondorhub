@@ -1,0 +1,17 @@
+{
+  "nombreEvento": "Paellas Night 11.0",
+  "subtitulo": "Centro Juniors Axenia",
+  "tagline": "Colabora con el Campamento de Verano 2027 del Centro Juniors Axenia",
+  "fechaTexto": "5 de agosto de 2027",
+  "hora": "A partir de las 19:00 h",
+  "lugar": "Centro Juniors Axenia",
+  "direccion": "C/ Emilio Casanova, 2",
+  "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Calle%20Emilio%20Casanova%202",
+  "incluye": ["Paella", "Bebida", "Fruta"],
+  "precioTicket": 8,
+  "maxTicketsPorReserva": 30,
+  "telefonoContacto": "686 024 156",
+  "aforo": null,
+  "reservasAbiertas": true,
+  "mensajeCerrado": "La reserva por la web esta cerrada. Llamanos y te ayudamos con tu reserva."
+}

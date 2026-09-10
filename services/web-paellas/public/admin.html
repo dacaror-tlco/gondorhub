@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es" class="admin">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel de reservas · Paellas Night</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="confetti" aria-hidden="true"></div>
+
+  <!-- gate opcional por token (solo si el servidor tiene ADMIN_TOKEN) -->
+  <div id="gate" class="card gate" hidden>
+    <h2>Panel privado</h2>
+    <p>Introduce el token de acceso.</p>
+    <input id="gateInput" type="password" autocomplete="off" placeholder="Token">
+    <button class="btn btn--primary btn--block" id="gateBtn">Entrar</button>
+    <p class="msg msg--err" id="gateErr" hidden>Token incorrecto.</p>
+  </div>
+
+  <div id="app" hidden>
+    <header class="site-header">
+      <div class="admin-head">
+        <img src="/assets/logo-axenia.png" alt="Juniors Axenia 603 D" class="admin-head__logo">
+        <div>
+          <h1>Panel de reservas — Paellas Night</h1>
+          <p>Pantalla privada · protégela con Cloudflare Access</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="stats" id="stats"></section>
+
+      <section class="toolbar">
+        <input type="search" id="buscar" placeholder="Buscar por nombre, código o teléfono…">
+        <select id="filtro">
+          <option value="todas">Todas</option>
+          <option value="sinPagar">Sin pagar</option>
+          <option value="sinEntregar">Sin entregar</option>
+          <option value="pagadas">Pagadas</option>
+          <option value="entregadas">Entregadas</option>
+          <option value="web">Reservas web</option>
+          <option value="manual">Añadidas a mano</option>
+        </select>
+        <button class="btn btn--sm" id="btnNueva">+ Añadir reserva</button>
+        <button class="btn btn--sm" id="btnCsv">Exportar CSV</button>
+        <button class="btn btn--sm" id="btnPrint">Imprimir lista</button>
+        <button class="btn btn--sm" id="btnRefrescar">Actualizar</button>
+      </section>
+
+      <p class="msg" id="msg" hidden></p>
+
+      <section class="tabla-wrap">
+        <table class="reservas">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Tickets</th>
+              <th>Total</th>
+              <th>Teléfono</th>
+              <th>Pagado</th>
+              <th>Entregado</th>
+              <th>Origen</th>
+              <th>Creada</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="vacio" id="vacio" hidden>Todavía no hay reservas.</div>
+      </section>
+
+      <p class="site-footer" style="text-align:left">
+        Actualiza sola cada 20&nbsp;s. Los datos se guardan en <code>data/reservas.json</code>.
+      </p>
+    </main>
+  </div>
+
+  <!-- modal añadir / editar -->
+  <dialog class="modal" id="modal">
+    <form method="dialog" class="modal__body" id="modalForm">
+      <h3 id="modalTitulo">Añadir reserva</h3>
+      <div class="field">
+        <label for="mNombre">Nombre de la reserva</label>
+        <input id="mNombre" required maxlength="80">
+      </div>
+      <div class="field">
+        <label for="mCantidad">Número de tickets</label>
+        <input id="mCantidad" type="number" min="1" max="500" value="1" required>
+      </div>
+      <div class="field">
+        <label for="mTelefono">Teléfono</label>
+        <input id="mTelefono" type="tel" maxlength="30">
+      </div>
+      <div class="field">
+        <label for="mNotas">Notas</label>
+        <input id="mNotas" maxlength="200" placeholder="Opcional">
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="mPagado"> Pagado</label>
+        <label><input type="checkbox" id="mEntregado"> Entregado</label>
+      </div>
+      <p class="msg msg--err" id="modalErr" hidden></p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--ghost btn--sm" id="modalCancelar">Cancelar</button>
+        <button type="submit" class="btn btn--primary btn--sm" id="modalGuardar">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

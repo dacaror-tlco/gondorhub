@@ -1,0 +1,13 @@
+{
+  "name": "paellas-night",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Reserva de tickets para la Paellas Night del Centro Juniors Axenia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

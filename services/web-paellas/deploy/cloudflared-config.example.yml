@@ -1,0 +1,10 @@
+# ~/.cloudflared/config.yml  (en la Raspberry Pi)
+# Sustituye <TUNNEL-ID> y el dominio por los tuyos.
+
+tunnel: <TUNNEL-ID>
+credentials-file: /home/pi/.cloudflared/<TUNNEL-ID>.json
+
+ingress:
+  - hostname: paellas.tudominio.com
+    service: http://localhost:3000
+  - service: http_status:404

@@ -1,0 +1,20 @@
+[Unit]
+Description=Paellas Night - servidor de reservas (Centro Juniors Axenia)
+After=network.target
+
+[Service]
+Type=simple
+# Ajusta la ruta a donde hayas copiado el proyecto en la Raspberry Pi
+WorkingDirectory=/home/pi/paellas-night
+ExecStart=/usr/bin/node server.js
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3000
+# Cinturon extra opcional (ademas de Cloudflare Access). Pon un secreto largo:
+# Environment=ADMIN_TOKEN=cambia-esto-por-algo-largo-y-aleatorio
+Restart=on-failure
+RestartSec=3
+User=pi
+
+[Install]
+WantedBy=multi-user.target
