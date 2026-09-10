@@ -12,6 +12,8 @@ services:
       - /mnt/hdd/code-server/config:/config
       - /mnt/hdd/web-campamento:/config/workspace/web-campamento
       - /mnt/hdd/web-palantir:/config/workspace/web-palantir
+      - /mnt/hdd/webs/web-asistencia:/config/workspace/web-asistencia
+      - /mnt/hdd/webs/web-paellas:/config/workspace/web-paellas
       - /mnt/hdd/portalpi:/config/workspace/portalpi
     ports:
       - "8085:8443"
