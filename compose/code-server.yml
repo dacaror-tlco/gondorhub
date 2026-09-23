@@ -13,6 +13,7 @@ services:
       - /mnt/hdd/web-campamento:/config/workspace/web-campamento
       - /mnt/hdd/web-palantir:/config/workspace/web-palantir
       - /mnt/hdd/webs/web-jefatura:/config/workspace/web-jefatura
+      - /mnt/hdd/webs/web-concilio:/config/workspace/web-concilio
       - /mnt/hdd/webs/web-paellas:/config/workspace/web-paellas
       - /mnt/hdd/portalpi:/config/workspace/portalpi
     ports:

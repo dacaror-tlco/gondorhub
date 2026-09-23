@@ -33,6 +33,7 @@ Homelab self-hosted sobre una Raspberry Pi 4B (4GB RAM), con dominio propio, pro
 | docker-controller-bot | Bot de Telegram para gestionar contenedores Docker | (sin subdominio, uso vía Telegram) |
 | rpi-monitor | Dashboard propio de monitorización del sistema (Flask + psutil) | `monitor.yourdomain.com` |
 | web-jefatura | App propia de jefatura de un grupo juvenil: asistencia + tesorería (PHP + JSON, sin BBDD) | `asistencia.yourdomain.com` |
+| web-concilio | App propia del campamento: inscripciones + tesorería (PHP + JSON, sin BBDD) | (puerto 8090) |
 | gondorhub-watch | Vigila el dominio y avisa por Telegram cuando LaLiga lo bloquea / desbloquea | (sin subdominio, uso vía Telegram) |
 
 ## Estructura del repo
@@ -61,6 +62,8 @@ gondorhub/
 │   ├── web-jefatura.yml
 │   ├── web-campamento.yml
 │   ├── web-palantir.yml
+│   ├── web-concilio.yml
+│   ├── web-paellas.yml
 │   └── wg-easy.yml
 ├── services/
 │   ├── rpi-monitor/           # Dashboard de monitorización (Flask + psutil), imagen construida manualmente

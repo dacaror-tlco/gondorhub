@@ -1,0 +1,46 @@
+# Web del Concilio (inscripciones + tesorería del campamento) · Juniors Axenia 603 D
+# ------------------------------------------------------------------
+# Flujo: copiar esta carpeta a la Pi por scp -> preparar (paso único,
+# debajo) -> en Portainer: Stacks -> Add stack -> pegar este archivo -> Deploy.
+#
+# Preparación en la Pi (una sola vez), dentro de /mnt/hdd/webs/web-concilio:
+#   cp includes/config.example.php includes/config.php   # y edita la contraseña
+#   cp data/seed.example.json      data/seed.json        # y pon la lista real (opcional)
+#   sudo chmod -R a+rX .                                 # el contenedor debe poder leer
+#   sudo chown -R 33:33 data && sudo chmod -R 775 data   # 33 = www-data del contenedor
+#
+# Se accede por IP_PI:8090 o por el dominio que apuntes a esa IP:puerto
+# (Cloudflare Tunnel, DNS, etc.) — este compose no sabe nada de eso, solo
+# expone el puerto.
+#
+# Para actualizar la web: sobrescribir los archivos con otro scp. Los
+# cambios en .php/.css/.js se ven al momento (la carpeta va montada,
+# no hay que redeplegar el stack). Si cambia este propio archivo, sí hay
+# que redeplegar desde Portainer.
+# ------------------------------------------------------------------
+
+services:
+  web-concilio:
+    image: php:8.3-apache
+    container_name: web-concilio
+    restart: unless-stopped
+
+    ports:
+      - "8090:80"
+
+    volumes:
+      - /mnt/hdd/webs/web-concilio:/var/www/html
+
+    # Activa AllowOverride (para que el .htaccess bloquee /data y /includes)
+    # y los módulos necesarios; luego arranca Apache. Sin Dockerfile.
+    command: >
+      bash -c "sed -ri 's|AllowOverride None|AllowOverride All|g' /etc/apache2/apache2.conf &&
+               a2enmod rewrite headers expires >/dev/null 2>&1;
+               exec apache2-foreground"
+
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/login.php') === false ? 1 : 0);"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

@@ -10,7 +10,9 @@ services:
       - /mnt/hdd/webs/web-palantir/backend:/app
       - /mnt/hdd/webs/web-palantir:/site:ro
       - /mnt/hdd/webs/web-palantir-uploads:/app/uploads
+      - "/mnt/hdd/webs/web-palantir/files/uploads dossier:/site/files/uploads dossier"
     command: sh -c "npm install --omit=dev && node server.js"
     environment:
       - PORT=3000
       - PUBLIC_DIR=/site
+      - FUNCIONES_PIN=${PALANTIR_FUNCIONES_PIN}
