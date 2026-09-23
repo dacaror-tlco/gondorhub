@@ -2,8 +2,8 @@
 
 const API = 'api.php';
 
-/** Llama al API. Para POST envía JSON + token CSRF. */
-async function api(action, body) {
+/** Llama al API. Para POST envía JSON + token CSRF. `query` añade parámetros GET. */
+async function api(action, body, { endpoint = API, query = {} } = {}) {
   const opciones = { method: body ? 'POST' : 'GET', headers: {} };
   if (body) {
     opciones.headers['Content-Type'] = 'application/json';
@@ -12,7 +12,8 @@ async function api(action, body) {
   }
   let resp;
   try {
-    resp = await fetch(`${API}?action=${encodeURIComponent(action)}`, opciones);
+    const params = new URLSearchParams({ action, ...query });
+    resp = await fetch(`${endpoint}?${params}`, opciones);
   } catch (e) {
     throw new Error('No hay conexión con el servidor.');
   }
@@ -60,6 +61,21 @@ function fechaBonita(iso) {
   if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return 'sin fecha';
   const [a, m, d] = iso.split('-');
   return `${d}/${m}/${a}`;
+}
+
+/** Formatea un importe en euros al estilo español: 1.234,56 € */
+const FORMATO_EUROS = new Intl.NumberFormat('es-ES', {
+  style: 'currency', currency: 'EUR', minimumFractionDigits: 2, useGrouping: 'always',
+});
+function euros(n) {
+  return FORMATO_EUROS.format(Number(n) || 0);
+}
+
+/** Lee un número escrito con coma o punto decimal ("12,5", "1.234,56"). NaN si no es válido. */
+function leerNumero(s) {
+  let t = String(s ?? '').replace(/[\s€]/g, '');
+  if (t.includes(',')) t = t.replace(/\./g, '').replace(',', '.');
+  return t === '' || isNaN(t) ? NaN : Number(t);
 }
 
 /** Normaliza para búsquedas (sin acentos, minúsculas). */

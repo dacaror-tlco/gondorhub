@@ -1,11 +1,20 @@
-# Web de asistencia · Juniors Axenia 603 D
+# Web de jefatura (asistencia y tesorería) · Juniors Axenia 603 D
 
-Aplicación web para llevar el control de asistencia de **educadores y colaboradores**
-a las actividades del curso.
+Aplicación web del centro con dos secciones (se elige al entrar):
+
+**Asistencia** — control de asistencia de **educadores y colaboradores** a las actividades del curso.
 
 - **Personas**: lista de educadores y colaboradores (se puede añadir, editar, dar de baja).
 - **Actividades**: se crean a mano; para cada una se marca quién ha asistido.
 - **Resumen**: por cada persona, actividades totales que le corresponden, asistidas y porcentaje.
+
+**Tesorería** — contabilidad del centro (datos en `data/tesoreria.json`). El balance se puede ver por **año natural** (enero–diciembre) o por **curso escolar** (septiembre–agosto) con el interruptor de arriba.
+
+- **Movimientos**: ingreso o gasto → partida (filtrada según el tipo) → concepto → cantidad × precio.
+  Editar, borrar, filtrar, exportar CSV (columnas de la hoja «Balance» del Excel) y copia JSON.
+- **Balance**: ficha con el formato de la FICHA BALANCE (grupos, partidas, %, tartas, resultado
+  y comentario), lista para imprimir o guardar en PDF.
+- Las partidas están en `includes/partidas.php` (códigos del MODELO BALANCE; se añadió `G2.2 Cuota zona`).
 
 Diseño basado en la identidad de Juniors M.D. (verdes), con los logos de
 Juniors Axenia 603 D, Projecte Xaipe y la Parroquia Asunción de Nuestra Señora (Ayora).
@@ -17,7 +26,7 @@ Juniors Axenia 603 D, Projecte Xaipe y la Parroquia Asunción de Nuestra Señora
 Hay un `docker-compose.yml` listo. En Portainer: **Stacks → Add stack →**
 pega el contenido del fichero, ajusta el puerto (`8088:80` por defecto) y despliega.
 
-Antes, en la Pi, en `/mnt/hdd/webs/web-asistencia`:
+Antes, en la Pi, en `/mnt/hdd/webs/web-jefatura`:
 
 ```bash
 # 1) crear la config real y la lista real a partir de las plantillas
@@ -33,9 +42,13 @@ sudo chmod -R 775   data
 El contenedor usa la imagen oficial `php:8.3-apache`, activa `AllowOverride All`
 (para que el `.htaccess` bloquee `data/` e `includes/`) y trae un *healthcheck*
 para que Portainer muestre si sigue vivo. Los datos persisten en
-`/mnt/hdd/webs/web-asistencia/data/` (la carpeta va montada en el contenedor).
+`/mnt/hdd/webs/web-jefatura/data/` (la carpeta va montada en el contenedor).
 
-Para actualizar la web: copiar los archivos nuevos y reiniciar el contenedor.
+Para actualizar la web desde Windows: doble clic en **`subir-a-raspberry.bat`**.
+Envía solo el código (nunca `data/*.json` ni `includes/config.php`), hace antes una
+copia de `data/` y `config.php` en `~/copias-web-jefatura/` de la Pi y reajusta permisos.
+No hace falta reiniciar el contenedor. **No uses `scp -r` de la carpeta entera**: la copia
+local tiene sus propios datos de prueba y sobrescribiría los reales.
 
 El resto de este README es la instalación **sin Docker** (Apache/nginx directos).
 
@@ -57,11 +70,11 @@ sudo apt install apache2 php libapache2-mod-php
 
 ## 2. Instalación
 
-1. Copia toda la carpeta `web-asistencia` al sitio donde sirves las webs, por
+1. Copia toda la carpeta `web-jefatura` al sitio donde sirves las webs, por
    ejemplo `/var/www/asistencia`:
 
    ```bash
-   sudo cp -r web-asistencia /var/www/asistencia
+   sudo cp -r web-jefatura /var/www/asistencia
    ```
 
 2. Da permisos de escritura a la carpeta `data/` al usuario del servidor web
@@ -135,7 +148,7 @@ location ~ \.php$ {
 
 ## 3. Probarla en el ordenador antes de subirla
 
-Con PHP instalado en el PC, desde la carpeta `web-asistencia`:
+Con PHP instalado en el PC, desde la carpeta `web-jefatura`:
 
 ```bash
 php -S localhost:8000
@@ -179,8 +192,12 @@ categoría**:
 ## 6. Estructura de archivos
 
 ```
-web-asistencia/
-├── index.php            Inicio (resumen rápido + copias de seguridad)
+web-jefatura/
+├── index.php            Selector de sección (Asistencia / Tesorería)
+├── asistencia.php       Inicio de asistencia (resumen rápido + copias de seguridad)
+├── tesoreria.php        Tesorería: movimientos
+├── balance.php          Tesorería: ficha de balance imprimible
+├── api-tesoreria.php    API JSON de tesorería
 ├── actividades.php      Crear actividades y marcar asistencia
 ├── personas.php         Gestión de educadores y colaboradores
 ├── resumen.php          Resumen de asistencia por persona

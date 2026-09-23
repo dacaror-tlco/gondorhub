@@ -1,11 +1,17 @@
-# Proyecto: web de asistencia (Juniors Axenia 603 D)
+# Proyecto: web de jefatura (Juniors Axenia 603 D)
 
-App interna para llevar la asistencia de **educadores y colaboradores** de un
-grupo juvenil a las actividades del curso. Sustituye a una hoja de Excel de
-"recuento" que se llevaba a mano.
+App interna de jefatura de un grupo juvenil con dos secciones, que se eligen
+al entrar:
+
+- **Asistencia** de **educadores y colaboradores** a las actividades del curso.
+  Sustituye a una hoja de Excel de "recuento" que se llevaba a mano.
+- **Tesorería**: contabilidad del centro por partidas (las del MODELO BALANCE
+  de Juniors M.D.), con balance automático y ficha de balance imprimible.
+
+(Antes se llamaba `web-asistencia`; renombrada a `web-jefatura` al añadir tesorería.)
 
 - **Subdominio:** `asistencia.${DOMAIN}` (vía Nginx Proxy Manager → `${PI_HOST_IP}:8088`).
-- **Código:** [`services/web-asistencia/`](../services/web-asistencia/) · **Compose:** [`compose/web-asistencia.yml`](../compose/web-asistencia.yml)
+- **Código:** [`services/web-jefatura/`](../services/web-jefatura/) · **Compose:** [`compose/web-jefatura.yml`](../compose/web-jefatura.yml)
 
 ## Qué hace
 
@@ -14,6 +20,8 @@ grupo juvenil a las actividades del curso. Sustituye a una hoja de Excel de
 | Personas | Alta/edición/baja de educadores y colaboradores (dos categorías). |
 | Actividades | Se crean a mano (nombre, fecha, **ámbito**: educadores / colaboradores / ambos) y se marca quién asistió. |
 | Resumen | Por persona: actividades que le corresponden, asistidas y % (con exportación a CSV). |
+| Tesorería · Movimientos | Ingreso/gasto → partida (filtrada por tipo) → concepto → cantidad × precio. Editar, borrar, filtrar, CSV. |
+| Tesorería · Balance | Ficha tipo FICHA BALANCE (grupos, partidas, %, tartas SVG, resultado, comentario). Por **año natural** o **curso escolar** (sep–ago). Imprimible a PDF. |
 
 El **porcentaje** de cada persona se calcula sobre las actividades que le
 aplican por su categoría: un educador cuenta las de ámbito *educadores* + *ambos*;
@@ -22,11 +30,12 @@ un colaborador, las de *colaboradores* + *ambos*.
 ## Stack técnico
 
 - **PHP 8.3 + Apache** (imagen oficial `php:8.3-apache`), **sin base de datos**:
-  todo el estado vive en un único `data/data.json` (escritura atómica con
-  `flock` + rename). Elegido así por simplicidad y por lo pequeño del dataset
+  la asistencia vive en `data/data.json` y la tesorería en `data/tesoreria.json`
+  (escritura atómica con `flock` + rename). Elegido así por simplicidad y por lo pequeño del dataset
   (~50 personas, decenas de actividades al año).
-- Frontend vanilla (sin build): las páginas cargan el estado desde `api.php`
-  (JSON) y renderizan en el navegador.
+- Frontend vanilla (sin build): las páginas cargan el estado desde `api.php` /
+  `api-tesoreria.php` (JSON) y renderizan en el navegador. La ficha de balance
+  se genera en PHP. Partidas en `includes/partidas.php`.
 - **Auth:** contraseña única compartida en `includes/config.php` + sesión PHP +
   token CSRF en las peticiones de escritura. Protección básica; va detrás de
   HTTPS (NPM).
@@ -38,8 +47,9 @@ un colaborador, las de *colaboradores* + *ambos*.
 
 ## Archivos que NO van a git
 
-`includes/config.php` (contraseña real) y `data/seed.json` + `data/data.json`
-(nombres reales de las personas, muchas menores). Están en el `.gitignore` del
+`includes/config.php` (contraseña real), `data/seed.json` + `data/data.json`
+(nombres reales de las personas, muchas menores) y `data/tesoreria.json`.
+Tampoco `subir-a-raspberry.bat` (script de despliegue con usuario/IP de la Pi). Están en el `.gitignore` del
 servicio. En el repo solo hay plantillas: `config.example.php` y
 `seed.example.json`. El `.gitignore` raíz ya ignora `data/` entera; el
 `.gitignore` del servicio re-incluye solo `data/.htaccess` y `data/seed.example.json`.
@@ -47,13 +57,16 @@ servicio. En el repo solo hay plantillas: `config.example.php` y
 ## Flujo de trabajo
 
 1. Edición local en Windows (copia de trabajo en Nextcloud).
-2. Subida a la Pi por SCP a `/mnt/hdd/webs/web-asistencia`.
+2. Subida a la Pi con `subir-a-raspberry.bat` (local, fuera de git): empaqueta
+   solo el código (sin `data/*.json` ni `config.php`), hace copia de `data/` en
+   `~/copias-web-jefatura/` y extrae en `/mnt/hdd/webs/web-jefatura`.
+   **No usar `scp -r` de la carpeta entera**: machaca los datos reales.
 3. En la Pi, la primera vez: `cp includes/config.example.php includes/config.php`
    (y editar contraseña) y `cp data/seed.example.json data/seed.json` (lista real).
 4. Contenedor gestionado como **stack en Portainer**. Bind mount de la carpeta
    entera → cambios en `.php/.css/.js` no requieren reinicio; solo se
    redespliega si cambia `docker-compose.yml`.
-5. Copia de seguridad: basta con guardar `data/data.json` (hay botón de
+5. Copia de seguridad: basta con guardar `data/data.json` y `data/tesoreria.json` (hay botón de
    exportar/importar dentro de la web, y se puede cronificar un `cp`).
 
 ## Permisos (gotcha)
@@ -62,9 +75,9 @@ Apache dentro del contenedor corre como `www-data` = **uid 33**. Tras cada SCP
 como usuario normal, hay que dejar el árbol legible y `data/` escribible por el 33:
 
 ```bash
-sudo chmod -R a+rX /mnt/hdd/webs/web-asistencia
-sudo chown -R 33:33 /mnt/hdd/webs/web-asistencia/data
-sudo chmod -R 775   /mnt/hdd/webs/web-asistencia/data
+sudo chmod -R a+rX /mnt/hdd/webs/web-jefatura
+sudo chown -R 33:33 /mnt/hdd/webs/web-jefatura/data
+sudo chmod -R 775   /mnt/hdd/webs/web-jefatura/data
 ```
 
 Si no, Apache devuelve `403` con

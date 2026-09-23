@@ -10,3 +10,6 @@ includes/config.php
 
 # --- Restos de pruebas locales (Windows) ---
 iniciar-local.bat
+
+# Script de despliegue local (lleva la IP/usuario de la Pi)
+subir-a-raspberry.bat

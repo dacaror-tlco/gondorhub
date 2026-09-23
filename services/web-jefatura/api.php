@@ -94,18 +94,6 @@ if ($rawBody !== '' && $rawBody !== false) {
 
 $LIMITE_TEXTO = 200;
 
-function limpiar_texto($v, int $max): string
-{
-    $v = trim((string) $v);
-    $v = preg_replace('/\s+/u', ' ', $v);
-    if (function_exists('mb_substr')) {
-        $v = mb_substr($v, 0, $max);
-    } else {
-        $v = substr($v, 0, $max);
-    }
-    return $v;
-}
-
 try {
     switch ($action) {
 

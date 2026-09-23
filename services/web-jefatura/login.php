@@ -31,14 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=6">
+<link rel="stylesheet" href="assets/css/style.css?v=8">
 </head>
 <body class="pagina-login">
 <main class="login">
   <div class="login__tarjeta">
     <img src="assets/img/juniors-axenia-full.png" alt="Juniors Axenia 603 D" class="login__logo">
-    <h1>Control de asistencia</h1>
-    <p class="login__sub">Educadores y colaboradores · Curso <?= htmlspecialchars(APP_CURSO) ?></p>
+    <h1>Gestión del centro</h1>
+    <p class="login__sub">Asistencia y tesorería · Curso <?= htmlspecialchars(APP_CURSO) ?></p>
     <form method="post" class="login__form" autocomplete="off">
       <label for="clave">Contraseña</label>
       <input type="password" id="clave" name="clave" required autofocus

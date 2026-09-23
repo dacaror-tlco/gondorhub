@@ -1,29 +1,30 @@
-# Web de asistencia · Juniors Axenia 603 D
+# Web de jefatura (asistencia + tesorería) · Juniors Axenia 603 D
 # ------------------------------------------------------------------
 # Despliegue como STACK en Portainer (o `docker compose up -d` en la Pi).
 #
-# Preparación en la Pi (una vez), en /mnt/hdd/webs/web-asistencia:
+# Preparación en la Pi (una vez), en /mnt/hdd/webs/web-jefatura:
 #   cp includes/config.example.php includes/config.php   # y edita la contraseña
 #   cp data/seed.example.json      data/seed.json        # y pon la lista real
 #   sudo chmod -R a+rX .                                 # el contenedor debe poder leer
 #   sudo chown -R 33:33 data && sudo chmod -R 775 data   # 33 = www-data del contenedor
 #
-# Para actualizar la web: copiar los archivos nuevos (scp) y, si cambió
-# este compose, redeplegar el stack. Cambios en .php/.css/.js no requieren
+# Para actualizar la web: subir-a-raspberry.bat (nunca scp -r de la carpeta
+# entera: machacaría data/ y config.php). Si cambió este compose, redeplegar
+# el stack. Cambios en .php/.css/.js no requieren
 # reinicio (la carpeta va montada).
 # ------------------------------------------------------------------
 
 services:
-  web-asistencia:
+  web-jefatura:
     image: php:8.3-apache
-    container_name: web-asistencia
+    container_name: web-jefatura
     restart: unless-stopped
 
     ports:
       - "8088:80"          # NPM apunta aquí: asistencia.${DOMAIN} -> IP_PI:8088
 
     volumes:
-      - /mnt/hdd/webs/web-asistencia:/var/www/html
+      - /mnt/hdd/webs/web-jefatura:/var/www/html
 
     # Activa AllowOverride (para que el .htaccess bloquee /data y /includes)
     # y los módulos necesarios; luego arranca Apache. Sin Dockerfile.
@@ -40,7 +41,7 @@ services:
       start_period: 20s
 
     # Si prefieres que quede SOLO detrás de Nginx Proxy Manager, quita el
-    # bloque "ports" de arriba y descomenta esto (NPM apuntaría a web-asistencia:80):
+    # bloque "ports" de arriba y descomenta esto (NPM apuntaría a web-jefatura:80):
     # networks:
     #   - proxy
 

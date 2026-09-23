@@ -2,6 +2,7 @@
 require_once __DIR__ . '/includes/auth.php';
 exigir_login();
 
+$seccion = 'asistencia';
 $pagina = 'personas';
 $titulo = 'Personas';
 $scriptPagina = 'personas.js';

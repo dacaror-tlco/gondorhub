@@ -7,16 +7,16 @@
       <img src="assets/img/parroquia-blanco.png" alt="Parroquia Asunción de Nuestra Señora · Ayora">
     </div>
     <p class="pie__nota">
-      Herramienta interna de seguimiento de asistencia ·
+      Herramienta interna del centro ·
       Curso <?= htmlspecialchars(APP_CURSO) ?> ·
       Campaña <em>«Que es faça en mi»</em>
     </p>
   </div>
 </footer>
 <div id="avisos" class="avisos" aria-live="polite"></div>
-<script src="assets/js/app.js?v=6"></script>
+<script src="assets/js/app.js?v=8"></script>
 <?php if (!empty($scriptPagina)): ?>
-<script src="assets/js/<?= htmlspecialchars($scriptPagina) ?>?v=6"></script>
+<script src="assets/js/<?= htmlspecialchars($scriptPagina) ?>?v=8"></script>
 <?php endif; ?>
 </body>
 </html>

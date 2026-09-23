@@ -32,7 +32,7 @@ Homelab self-hosted sobre una Raspberry Pi 4B (4GB RAM), con dominio propio, pro
 | ddclient | Cliente DDNS, mantiene actualizado el hostname dinámico | (sin subdominio propio) |
 | docker-controller-bot | Bot de Telegram para gestionar contenedores Docker | (sin subdominio, uso vía Telegram) |
 | rpi-monitor | Dashboard propio de monitorización del sistema (Flask + psutil) | `monitor.yourdomain.com` |
-| web-asistencia | App propia de control de asistencia de un grupo juvenil (PHP + JSON, sin BBDD) | `asistencia.yourdomain.com` |
+| web-jefatura | App propia de jefatura de un grupo juvenil: asistencia + tesorería (PHP + JSON, sin BBDD) | `asistencia.yourdomain.com` |
 | gondorhub-watch | Vigila el dominio y avisa por Telegram cuando LaLiga lo bloquea / desbloquea | (sin subdominio, uso vía Telegram) |
 
 ## Estructura del repo
@@ -58,20 +58,20 @@ gondorhub/
 │   ├── qbittorrent.yml
 │   ├── samba.yml
 │   ├── vaultwarden.yml
-│   ├── web-asistencia.yml
+│   ├── web-jefatura.yml
 │   ├── web-campamento.yml
 │   ├── web-palantir.yml
 │   └── wg-easy.yml
 ├── services/
 │   ├── rpi-monitor/           # Dashboard de monitorización (Flask + psutil), imagen construida manualmente
-│   ├── web-asistencia/        # App de control de asistencia (PHP + Apache, sin BBDD)
+│   ├── web-jefatura/        # App de jefatura: asistencia + tesorería (PHP + Apache, sin BBDD)
 │   └── gondorhub-watch/       # Vigilante del dominio: avisa por Telegram del bloqueo de LaLiga
 ├── docs/
 │   ├── architecture.md        # Arquitectura de red, DNS, SSL
 │   ├── services.md            # Detalle de cada servicio y su configuración
 │   ├── troubleshooting.md     # Problemas resueltos y soluciones (aprendizajes)
 │   ├── camp-project.md        # Proyecto de las webs del campamento
-│   ├── web-asistencia.md      # Proyecto de la web de asistencia
+│   ├── web-jefatura.md      # Proyecto de la web de jefatura
 │   ├── networking.md          # Puertos, DDNS, ZeroTier, bot de Telegram
 │   ├── cloudflare-access.md   # Zero Trust / Access con Google como IdP
 │   ├── setup-docker-portainer.md # Instalación base de Docker + Portainer

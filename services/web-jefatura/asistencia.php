@@ -32,7 +32,8 @@ $acts = $data['actividades'];
 usort($acts, fn($a, $b) => strcmp($b['fecha'] ?: '0000', $a['fecha'] ?: '0000'));
 $ultimas = array_slice($acts, 0, 5);
 
-$pagina = 'index';
+$seccion = 'asistencia';
+$pagina = 'asistencia';
 $titulo = 'Inicio';
 require __DIR__ . '/includes/layout.php';
 ?>
@@ -108,7 +109,7 @@ require __DIR__ . '/includes/layout.php';
 
 <section class="panel">
   <h2>Copia de seguridad</h2>
-  <p>Los datos se guardan en la Raspberry en <code>data/data.json</code>. Descarga una copia de vez en cuando.</p>
+  <p>Los datos de asistencia se guardan en la Raspberry en <code>data/data.json</code>. Descarga una copia de vez en cuando.</p>
   <div class="fila-botones">
     <a class="boton boton--secundario" href="api.php?action=export">Exportar copia (.json)</a>
     <label class="boton boton--secundario">

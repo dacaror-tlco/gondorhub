@@ -62,7 +62,13 @@ function cargar_datos(): array
 /** Guarda los datos de forma atómica. */
 function guardar_datos(array $data): void
 {
-    $dir = dirname(DATA_FILE);
+    escribir_json_atomico(DATA_FILE, $data);
+}
+
+/** Escribe $data como JSON en $fichero de forma atómica (tmp + rename). */
+function escribir_json_atomico(string $fichero, array $data): void
+{
+    $dir = dirname($fichero);
     if (!is_dir($dir)) {
         mkdir($dir, 0775, true);
     }
@@ -74,9 +80,9 @@ function guardar_datos(array $data): void
     if (file_put_contents($tmp, $json, LOCK_EX) === false) {
         throw new RuntimeException('No se pudo escribir el fichero temporal');
     }
-    if (!rename($tmp, DATA_FILE)) {
+    if (!rename($tmp, $fichero)) {
         @unlink($tmp);
-        throw new RuntimeException('No se pudo reemplazar data.json');
+        throw new RuntimeException('No se pudo reemplazar ' . basename($fichero));
     }
 }
 
@@ -87,20 +93,26 @@ function guardar_datos(array $data): void
  */
 function modificar_datos(callable $fn): array
 {
-    $lockPath = dirname(DATA_FILE) . '/.data.lock';
-    $lock = fopen($lockPath, 'c');
-    if ($lock === false) {
-        throw new RuntimeException('No se pudo abrir el bloqueo');
-    }
-    try {
-        flock($lock, LOCK_EX);
-        $data = cargar_datos();
-        $nuevo = $fn($data);
+    return con_bloqueo('.data.lock', function () use ($fn) {
+        $nuevo = $fn(cargar_datos());
         if (!is_array($nuevo)) {
             throw new RuntimeException('La operación no devolvió datos válidos');
         }
         guardar_datos($nuevo);
         return $nuevo;
+    });
+}
+
+/** Ejecuta $fn con un bloqueo exclusivo sobre data/$nombreLock. */
+function con_bloqueo(string $nombreLock, callable $fn)
+{
+    $lock = fopen(dirname(DATA_FILE) . '/' . $nombreLock, 'c');
+    if ($lock === false) {
+        throw new RuntimeException('No se pudo abrir el bloqueo');
+    }
+    try {
+        flock($lock, LOCK_EX);
+        return $fn();
     } finally {
         flock($lock, LOCK_UN);
         fclose($lock);
@@ -110,6 +122,19 @@ function modificar_datos(callable $fn): array
 /* ---------------------------------------------------------------------------
  *  Utilidades de dominio
  * ------------------------------------------------------------------------- */
+
+/** Recorta espacios, colapsa blancos y limita la longitud. */
+function limpiar_texto($v, int $max): string
+{
+    $v = trim((string) $v);
+    $v = preg_replace('/\s+/u', ' ', $v);
+    if (function_exists('mb_substr')) {
+        $v = mb_substr($v, 0, $max);
+    } else {
+        $v = substr($v, 0, $max);
+    }
+    return $v;
+}
 
 function nuevo_id(string $prefijo, array $existentes): string
 {
