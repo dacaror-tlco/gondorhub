@@ -1,0 +1,26 @@
+{
+  "zona": {
+    "ajustes": {
+      "entidad": "Zona Interior",
+      "iban": "ES00 0000 0000 0000 0000 0000",
+      "banco": "Banco",
+      "tesorero": "Nombre Tesorero",
+      "cargo_tesorero": "Tesorero Zona Interior",
+      "delegado": "Nombre Delegado",
+      "cargo_delegado": "Delegado Zona Interior"
+    },
+    "miembros": [
+      { "id": "m001", "nombre": "Delegado de Zona", "numero": "", "localidad": "", "tipo": "otro", "iban": "", "activo": true },
+      { "id": "m002", "nombre": "Centro A", "numero": "601D", "localidad": "", "tipo": "centro", "iban": "", "activo": true },
+      { "id": "m003", "nombre": "Centro B", "numero": "602D", "localidad": "", "tipo": "centro", "iban": "", "activo": true }
+    ],
+    "lugares": [
+      { "id": "l001", "nombre": "Centro A", "miembro": "m002", "tarifas": { "m001": 10, "m002": 0, "m003": 10 } },
+      { "id": "l002", "nombre": "Centro B", "miembro": "m003", "tarifas": { "m001": 20, "m002": 10, "m003": 0 } },
+      { "id": "l003", "nombre": "Online", "miembro": null, "tarifas": {} }
+    ]
+  },
+  "tesoreria": {
+    "movimientos": []
+  }
+}

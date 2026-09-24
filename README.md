@@ -34,6 +34,7 @@ Homelab self-hosted sobre una Raspberry Pi 4B (4GB RAM), con dominio propio, pro
 | rpi-monitor | Dashboard propio de monitorización del sistema (Flask + psutil) | `monitor.yourdomain.com` |
 | web-jefatura | App propia de jefatura de un grupo juvenil: asistencia + tesorería (PHP + JSON, sin BBDD) | `asistencia.yourdomain.com` |
 | web-concilio | App propia del campamento: inscripciones + tesorería (PHP + JSON, sin BBDD) | (puerto 8090) |
+| web-interior | App de tesorería de una zona de grupos juveniles: movimientos, actividades, transporte, cuota e informe económico (PHP + JSON, sin BBDD) | `interior.yourdomain.com` |
 | gondorhub-watch | Vigila el dominio y avisa por Telegram cuando LaLiga lo bloquea / desbloquea | (sin subdominio, uso vía Telegram) |
 
 ## Estructura del repo
@@ -63,11 +64,13 @@ gondorhub/
 │   ├── web-campamento.yml
 │   ├── web-palantir.yml
 │   ├── web-concilio.yml
+│   ├── web-interior.yml
 │   ├── web-paellas.yml
 │   └── wg-easy.yml
 ├── services/
 │   ├── rpi-monitor/           # Dashboard de monitorización (Flask + psutil), imagen construida manualmente
 │   ├── web-jefatura/        # App de jefatura: asistencia + tesorería (PHP + Apache, sin BBDD)
+│   ├── web-interior/        # App de tesorería de la zona (PHP + Apache, sin BBDD)
 │   └── gondorhub-watch/       # Vigilante del dominio: avisa por Telegram del bloqueo de LaLiga
 ├── docs/
 │   ├── architecture.md        # Arquitectura de red, DNS, SSL
@@ -75,6 +78,7 @@ gondorhub/
 │   ├── troubleshooting.md     # Problemas resueltos y soluciones (aprendizajes)
 │   ├── camp-project.md        # Proyecto de las webs del campamento
 │   ├── web-jefatura.md      # Proyecto de la web de jefatura
+│   ├── web-interior.md      # Proyecto de la web de tesorería de la zona
 │   ├── networking.md          # Puertos, DDNS, ZeroTier, bot de Telegram
 │   ├── cloudflare-access.md   # Zero Trust / Access con Google como IdP
 │   ├── setup-docker-portainer.md # Instalación base de Docker + Portainer

@@ -1,0 +1,30 @@
+# Web de tesorería de la Zona Interior (Juniors M.D.): movimientos y balance,
+# actividades, transporte a los CJZ, cuota de zona e informe económico (PHP + JSON, sin BBDD).
+# Código y documentación completos en services/web-interior/ y docs/web-interior.md
+#
+# ANTES de desplegar el stack, la carpeta /mnt/hdd/webs/web-interior tiene que tener
+# la web (primera vez: primera-instalacion.bat, fuera de git). Si el stack arranca con
+# la carpeta vacía, Docker la crea vacía y el healthcheck da 404 en login.php (unhealthy).
+# Después, en /mnt/hdd/webs/web-interior:
+#   nano includes/config.php                             # contraseña real
+#   sudo chmod -R a+rX . && sudo chown -R 33:33 data && sudo chmod -R 775 data
+
+services:
+  web-interior:
+    image: php:8.3-apache
+    container_name: web-interior
+    restart: unless-stopped
+    ports:
+      - "8092:80"          # NPM: interior.${DOMAIN} -> ${PI_HOST_IP}:8092
+    volumes:
+      - /mnt/hdd/webs/web-interior:/var/www/html
+    command: >
+      bash -c "sed -ri 's|AllowOverride None|AllowOverride All|g' /etc/apache2/apache2.conf &&
+               a2enmod rewrite headers expires >/dev/null 2>&1;
+               exec apache2-foreground"
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1/login.php') === false ? 1 : 0);"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

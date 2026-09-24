@@ -1,0 +1,14 @@
+# El .gitignore raíz del repo ignora "data/" entera. Aquí re-incluimos
+# SOLO el .htaccess y la plantilla de seed; el resto de data/ sigue fuera.
+!data/
+data/*
+!data/.htaccess
+!data/seed.example.json
+
+# --- Nunca versionar: config y datos reales (se crean en la Pi) ---
+includes/config.php
+
+# --- Scripts locales (llevan la IP/usuario de la Pi o la contraseña de pruebas) ---
+iniciar-local.bat
+subir-a-raspberry.bat
+primera-instalacion.bat
