@@ -1,0 +1,29 @@
+# RedBook — El Libro Rojo (apuntes y metodología del máster de ciberseguridad).
+# Web estática MkDocs Material. El stack se autocompila al desplegar:
+#   - redbook-build: genera site/ a partir de docs/ (se ejecuta y termina)
+#   - web-redbook:   nginx sirve site/ (arranca cuando el build termina OK)
+#
+# Flujo al cambiar contenido: scp de la carpeta a /mnt/hdd/webs/RedBook  ->  Recreate del stack.
+# No hay pasos manuales: el Recreate vuelve a compilar y a servir.
+
+services:
+  redbook-build:
+    image: squidfunk/mkdocs-material:9.5.39
+    container_name: redbook-build
+    working_dir: /docs
+    volumes:
+      - /mnt/hdd/webs/RedBook:/docs
+    command: build --clean
+    restart: "no"
+
+  web-redbook:
+    image: nginx:alpine
+    container_name: web-redbook
+    restart: unless-stopped
+    depends_on:
+      redbook-build:
+        condition: service_completed_successfully
+    ports:
+      - "8093:80"          # NPM: redbook.${DOMAIN} -> ${PI_HOST_IP}:8093
+    volumes:
+      - /mnt/hdd/webs/RedBook/site:/usr/share/nginx/html:ro
