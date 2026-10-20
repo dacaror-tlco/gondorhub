@@ -2,6 +2,14 @@
 
 Problemas reales encontrados montando este homelab, y cómo se resolvieron.
 
+## `Data consistency error` / todo arranca "de cero"
+
+**Síntoma:** los contenedores fallan con `Data consistency error`. Después de reiniciar, Nextcloud enseña el instalador, Jellyfin el asistente y MariaDB inicializa una BD vacía.
+
+**Causa:** ext4 corrupto en el HDD (`EUCLEAN`, *"Structure needs cleaning"* en glibc). El fsck reparó el disco moviendo el contenido de `/mnt/hdd` a `/lost+found`, y Docker recreó carpetas vacías.
+
+**Solución:** no completar ningún instalador ni asistente, parar los contenedores y seguir [disaster-recovery.md](disaster-recovery.md).
+
 ## `network_mode: host` y NPM
 
 **Síntoma:** NPM no puede enrutar a un contenedor que usa `network_mode: host`; el nombre del contenedor no resuelve.

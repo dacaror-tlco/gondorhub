@@ -82,8 +82,10 @@ gondorhub/
 │   ├── networking.md          # Puertos, DDNS, ZeroTier, bot de Telegram
 │   ├── cloudflare-access.md   # Zero Trust / Access con Google como IdP
 │   ├── setup-docker-portainer.md # Instalación base de Docker + Portainer
-│   └── cheatsheet-comandos.md # Chuleta de comandos Linux/Pi usados habitualmente
+│   ├── cheatsheet-comandos.md # Chuleta de comandos Linux/Pi usados habitualmente
+│   └── disaster-recovery.md   # Runbook: disco corrupto, fsck → /lost+found, reconstrucción de Nextcloud/MariaDB
 └── scripts/                  # Scripts de utilidad (monitorización, deploy, etc.)
+    └── recovery/              # Inventario de /lost+found y reconstrucción de la BD de Nextcloud
 ```
 
 ## Cómo usar este repo
@@ -102,6 +104,7 @@ Ver [`docs/troubleshooting.md`](docs/troubleshooting.md) para el detalle, pero e
 - Portainer solo acepta compose sin `build:` — las imágenes custom hay que construirlas antes por SSH.
 - Bind mounts de **archivos individuales** (no carpetas) deben existir en el host antes del primer deploy, o Docker los crea como carpetas vacías y el contenedor falla. Ver el caso de Filebrowser abajo.
 - Los servicios con imagen custom (como rpi-monitor) no se despliegan en un solo paso vía Portainer: la imagen hay que construirla antes por SSH, y solo entonces se pega el stack.
+- `Data consistency error` en los contenedores = ext4 corrupto (`EUCLEAN`). El fsck puede vaciar `/mnt/hdd` en `/lost+found`: todo se recuperó, incluida la BD de Nextcloud regenerando sus `.frm`. Ver [`docs/disaster-recovery.md`](docs/disaster-recovery.md).
 - Bibliotecas restringidas en Jellyfin (un usuario con acceso solo a un subconjunto de contenido) requieren symlinks **relativos**, no rutas absolutas del host — el contenedor no conoce la ruta del host, solo sus propios puntos de montaje. Ver detalle abajo.
 
 ### Filebrowser: bind mounts de archivos individuales
