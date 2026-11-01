@@ -1,0 +1,16 @@
+services:
+  web-pj:
+    image: node:22-alpine
+    container_name: web-pj
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "8097:3000"          # NPM: pj.${DOMAIN} -> ${PI_HOST_IP}:8097
+    volumes:
+      - /mnt/hdd/webs/web-PJ:/app
+    command: node server.js
+    environment:
+      - PORT=3000
+      # PIN iniciales (solo se usan la primera vez; luego se cambian desde Claves)
+      - PIN_GESTION=${PJ_PIN_GESTION}
+      - PIN_RESUMEN=${PJ_PIN_RESUMEN}

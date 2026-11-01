@@ -105,3 +105,16 @@ sudo chmod -R a+rX /ruta/al/sitio
    scp -r "carpeta-local/." usuario@host:/ruta/carpeta-remota/
    ```
 3. El contenedor recoge los archivos nuevos en el siguiente reinicio automático (el `restart: unless-stopped` ya está reintentando) — no hace falta redesplegar el stack a mano.
+
+## `no route to host` entre contenedores del mismo stack (MAC duplicada)
+
+**Síntoma:** PhotoPrism se queda en `config: waiting for the database to become available` y el log muestra `dial tcp <ip-mariadb>:3306: connect: no route to host`. MariaDB está `ready for connections`, los dos contenedores están en la misma red del stack y el nombre resuelve bien, pero ni el ping entre ellos funciona. Reiniciar los contenedores no lo arregla.
+
+**Causa:** los dos contenedores tenían **la misma dirección MAC** en la red del stack (`docker inspect <c> --format '{{range .NetworkSettings.Networks}}{{.MacAddress}}{{end}}'`). Docker deriva la MAC de la IP al crear el endpoint y la guarda en la config del contenedor; tras la recuperación del disco, MariaDB arrancó con otra IP pero conservando la MAC antigua, que coincidía con la de PhotoPrism. El bridge entrega entonces las tramas al contenedor equivocado. `docker restart` reutiliza la MAC guardada, por eso no sirve.
+
+**Solución:** recrear los contenedores (no reiniciarlos) para que reciban MAC nueva. Desde Portainer: stack → *Update the stack* con *Re-pull/redeploy*, o por SSH con el mismo nombre de proyecto para que Portainer siga gestionándolo:
+```bash
+sudo cp /var/lib/docker/volumes/portainer_data/_data/compose/<id>/docker-compose.yml /tmp/s.yml && sudo chmod 644 /tmp/s.yml
+docker compose -p <nombre-stack> -f /tmp/s.yml up -d --force-recreate
+```
+Los datos van en bind mounts, así que recrear no pierde nada.

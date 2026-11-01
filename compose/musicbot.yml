@@ -1,0 +1,23 @@
+# Bot de Telegram de música: sugerencias semanales a partir de lo escuchado en Jellyfin
+# y descarga vía MeTube a la carpeta de Samba. Sin puertos publicados.
+# El código (bot.py) vive en el propio HDD: /mnt/hdd/samba/.musicbot/bot.py
+
+services:
+  musicbot:
+    image: python:3.12-slim
+    container_name: musicbot
+    restart: unless-stopped
+    command: python -u /samba/.musicbot/bot.py
+    environment:
+      TG_TOKEN: "${MUSICBOT_TELEGRAM_TOKEN}"
+      JF_URL: "http://${PI_HOST_IP}:8096"
+      JF_KEY: "${JELLYFIN_API_KEY}"
+      JF_USER: "${JELLYFIN_USER}"
+      METUBE_URL: "http://${PI_HOST_IP}:8081"
+      SAMBA_DIR: "/samba"
+      RUN_HOUR_UTC: "8"     # 10:00 en España (09:00 en invierno)
+      WEEKLY_DAY: "0"       # lunes
+      SUGG_PER_WEEK: "5"
+      TOP_TRACKS: "10"
+    volumes:
+      - /mnt/hdd/samba:/samba

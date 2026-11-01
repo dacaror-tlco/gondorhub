@@ -36,6 +36,11 @@ Homelab self-hosted sobre una Raspberry Pi 4B (4GB RAM), con dominio propio, pro
 | web-concilio | App propia del campamento: inscripciones + tesorería (PHP + JSON, sin BBDD) | (puerto 8090) |
 | web-interior | App de tesorería de una zona de grupos juveniles: movimientos, actividades, transporte, cuota e informe económico (PHP + JSON, sin BBDD) | `interior.yourdomain.com` |
 | gondorhub-watch | Vigila el dominio y avisa por Telegram cuando LaLiga lo bloquea / desbloquea | (sin subdominio, uso vía Telegram) |
+| web-redbook | Apuntes del máster de ciberseguridad (MkDocs Material, se autocompila al desplegar) | `redbook.yourdomain.com` |
+| web-confirmacion | Web de un grupo de confirmación con sección privada por contraseña (PHP + JSON) | `confirmacion.yourdomain.com` |
+| web-juegos | Juegos web estáticos (nginx) | `juegos.yourdomain.com` |
+| web-pj | App Node para gestión con PIN (gestión / resumen) | `pj.yourdomain.com` |
+| musicbot | Bot de Telegram: sugerencias de música desde Jellyfin y descarga vía MeTube | (sin subdominio, uso vía Telegram) |
 
 ## Estructura del repo
 
@@ -66,6 +71,14 @@ gondorhub/
 │   ├── web-concilio.yml
 │   ├── web-interior.yml
 │   ├── web-paellas.yml
+│   ├── web-redbook.yml
+│   ├── web-confirmacion.yml
+│   ├── web-juegos.yml
+│   ├── web-pj.yml
+│   ├── rpi-monitor.yml
+│   ├── gondorhub-watch.yml
+│   ├── musicbot.yml
+│   ├── portainer.yml
 │   └── wg-easy.yml
 ├── services/
 │   ├── rpi-monitor/           # Dashboard de monitorización (Flask + psutil), imagen construida manualmente

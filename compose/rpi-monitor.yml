@@ -1,0 +1,18 @@
+# Dashboard de monitorización (Flask + psutil). Imagen propia: construirla antes por SSH
+#   cd services/rpi-monitor && docker build -t rpi-monitor:latest .
+# y pegar esto en Portainer (sin `build:`). network_mode: host -> escucha en el 5000 del host.
+# NPM: monitor.${DOMAIN} -> ${PI_HOST_IP}:5000
+
+version: "3.8"
+services:
+  rpi-monitor:
+    image: rpi-monitor:latest
+    container_name: rpi-monitor
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/rootfs:ro
+    environment:
+      - HOST_PROC=/host/proc

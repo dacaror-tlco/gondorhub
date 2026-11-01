@@ -1,0 +1,21 @@
+# Portainer CE: NO es un stack (se creó con docker run). Equivalente en compose,
+# por si hay que recrearlo:
+#   docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always \
+#     -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+# NPM: portainer.${DOMAIN} -> https://${PI_HOST_IP}:9443
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "8000:8000"     # túnel de agentes Edge
+      - "9443:9443"     # panel web (HTTPS, certificado autofirmado)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+volumes:
+  portainer_data:
+    external: true      # el volumen ya existe en la Pi con toda la config
