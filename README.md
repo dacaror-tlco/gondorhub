@@ -96,6 +96,7 @@ gondorhub/
 │   ├── cloudflare-access.md   # Zero Trust / Access con Google como IdP
 │   ├── setup-docker-portainer.md # Instalación base de Docker + Portainer
 │   ├── cheatsheet-comandos.md # Chuleta de comandos Linux/Pi usados habitualmente
+│   ├── acceso-remoto-tailscale.md # Acceso SSH de rescate fuera de Docker (Tailscale) + runbook
 │   └── disaster-recovery.md   # Runbook: disco corrupto, fsck → /lost+found, reconstrucción de Nextcloud/MariaDB
 └── scripts/                  # Scripts de utilidad (monitorización, deploy, etc.)
     └── recovery/              # Inventario de /lost+found y reconstrucción de la BD de Nextcloud
@@ -118,6 +119,8 @@ Ver [`docs/troubleshooting.md`](docs/troubleshooting.md) para el detalle, pero e
 - Bind mounts de **archivos individuales** (no carpetas) deben existir en el host antes del primer deploy, o Docker los crea como carpetas vacías y el contenedor falla. Ver el caso de Filebrowser abajo.
 - Los servicios con imagen custom (como rpi-monitor) no se despliegan en un solo paso vía Portainer: la imagen hay que construirla antes por SSH, y solo entonces se pega el stack.
 - `Data consistency error` en los contenedores = ext4 corrupto (`EUCLEAN`). El fsck puede vaciar `/mnt/hdd` en `/lost+found`: todo se recuperó, incluida la BD de Nextcloud regenerando sus `.frm`. Ver [`docs/disaster-recovery.md`](docs/disaster-recovery.md).
+- El bot de Telegram y wg-easy viven en Docker: si Docker cae, no hay acceso remoto. Tailscale instalado en el **sistema** (no en un contenedor) da SSH de rescate independiente, sin abrir puertos. Ver [`docs/acceso-remoto-tailscale.md`](docs/acceso-remoto-tailscale.md).
+- `apt update` con `changed its 'Suite' value ... oldstable` bloquea todas las actualizaciones (y cualquier instalador basado en apt) hasta aceptar con `--allow-releaseinfo-change`.
 - Bibliotecas restringidas en Jellyfin (un usuario con acceso solo a un subconjunto de contenido) requieren symlinks **relativos**, no rutas absolutas del host — el contenedor no conoce la ruta del host, solo sus propios puntos de montaje. Ver detalle abajo.
 
 ### Filebrowser: bind mounts de archivos individuales

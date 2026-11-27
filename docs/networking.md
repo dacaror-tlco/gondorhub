@@ -40,3 +40,7 @@ desde Telegram. Necesita:
 
 - `TELEGRAM_TOKEN`: token del bot, obtenido de [@BotFather](https://t.me/BotFather).
 - `TELEGRAM_ADMIN`: tu ID numérico de usuario de Telegram (para restringir quién puede controlar el bot).
+
+## Acceso remoto de rescate (Tailscale)
+
+Tailscale está instalado en el **sistema** de la Pi (no en Docker) con Tailscale SSH, como vía de acceso independiente del bot, de wg-easy y de Cloudflare. No necesita puertos abiertos en el router. Ver [acceso-remoto-tailscale.md](acceso-remoto-tailscale.md).

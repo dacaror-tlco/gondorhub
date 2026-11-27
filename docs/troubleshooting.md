@@ -118,3 +118,27 @@ sudo cp /var/lib/docker/volumes/portainer_data/_data/compose/<id>/docker-compose
 docker compose -p <nombre-stack> -f /tmp/s.yml up -d --force-recreate
 ```
 Los datos van en bind mounts, así que recrear no pierde nada.
+
+## `apt update` falla con "changed its 'Suite' value"
+
+**Síntoma:** `sudo apt-get update` termina con errores `E:` del tipo:
+
+```
+E: Repository 'http://deb.debian.org/debian-security bookworm-security InRelease' changed its 'Label' value from 'Debian' to 'Debian-Security'
+E: Repository 'http://archive.raspberrypi.com/debian bookworm InRelease' changed its 'Origin' value from 'Debian' to 'Raspberry Pi Foundation'
+N: ... changed its 'Suite' value from 'stable-updates' to 'oldstable' ...
+```
+
+y cualquier instalador que dependa de apt (p. ej. el de Tailscale) se para sin instalar nada (`Unit file tailscaled.service does not exist`).
+
+**Causa:** con la salida de la nueva Debian estable, bookworm pasó de `stable` a `oldstable`, y apt exige aceptar explícitamente los cambios de metadatos del repositorio. Los valores "antiguos" que muestra (`bookworm-updates` en el repo de seguridad, origen `Debian` en el de Raspberry Pi) indican además una caché de listas desfasada/cruzada. Mientras no se acepta, **la Pi deja de recibir actualizaciones, incluidas las de seguridad**.
+
+**Solución:**
+
+```bash
+sudo apt-get update --allow-releaseinfo-change
+# solo si sigue habiendo errores E: (la caché se regenera, no borra paquetes):
+sudo rm -rf /var/lib/apt/lists/* && sudo apt-get update --allow-releaseinfo-change
+```
+
+Después revisar lo pendiente (`apt list --upgradable`) antes de actualizar: puede incluir Docker, que reinicia todos los contenedores.
